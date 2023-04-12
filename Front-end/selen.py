@@ -7,8 +7,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+# from webdriver_manager.safari import SafariDriverManager
 
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.edge.service import Service as EdgeService
 
 class Selen:
 
@@ -22,24 +27,39 @@ class Selen:
                 opts.add_argument('headless')
             opts.add_argument('window-size=1600x2600')
 
-            self.WD = webdriver.Chrome(options=opts, service=ChromeService(ChromeDriverManager().install()))
+            self.WD = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=opts)
+
+        elif wd == "Firefox":
+            opts = webdriver.FirefoxOptions()
+            opts.add_argument('--start-maximized')
+            opts.add_argument('--disable-extensions')
+            self.WD = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=opts)
+
+        elif wd == "Edge":
+            opts = webdriver.EdgeOptions()
+            opts.use_chromium = True
+            opts.binary_location = '/opt/microsoft/msedge/msedge'
+            opts.add_argument('--start-maximized')
+            self.WD = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=opts)
 
         self.WD.maximize_window()
         self.WD.act_chain = ActionChains(self)
+        self.WDW = WebDriverWait(self.WD, 10)
         self.url = ""
 
     def click_to(self, *args):
-        print("Click element:", args)
+        # print("Click element:", args)
         self.find(*args).click()
 
     def wait_click_to(self, *args):
-        print("Click element:", args)
+        # print("Click element:", args)
         self.wait_find(*args).click()
 
     def wait_find(self, *args):
         print("Looking for :", args)
         try:
-            elem = self.WD.find_element(*args[0])
+            elem = self.WDW.until(EC.presence_of_element_located(args[0]))
+            # elem = self.WD.find_element(*args[0])
         except NoSuchElementException:
             print("Element not found!")
             return None
@@ -69,11 +89,13 @@ class Selen:
         elem = self.wait_find(*args)
         print(elem)
         elem.click()
+        elem.clear()
         elem.send_keys(text)
 
     def text_to(self, text: str, *args):
         elem = self.find(*args)
         elem.click()
+        elem.clear()
         elem.send_keys(text)
 
     def check_title(self, title):
