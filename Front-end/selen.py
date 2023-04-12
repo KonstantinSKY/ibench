@@ -88,6 +88,10 @@ class Selen:
             print("Got:", self.WD.current_url)
             print("Expected:", url)
 
+    def save_cookies_to_file(self, file_name):
+        with open(file_name, 'a') as f:
+            f.write(f'COOKIES = {self.WD.get_cookies()}\n')
+
 
     # def get_elem(self, find_func):
     #     self.WD.get(self.url + self.link)
