@@ -28,17 +28,9 @@ class Selen:
         self.WD.act_chain = ActionChains(self)
         self.url = ""
 
-    #
-    # @staticmethod
-    # def normalize_link(link: str):
-    #     return link.strip().replace(" ", "%20")
-    #
-    # def get(self, link):
-    #     self.drv.get(self.url + link)
-    #
-    # def set_elem_attrs(self):
-    #     setattr(self.elem, "find", self.elem.find_element)
-    #     setattr(self.elem, "finds", self.elem.find_elements)
+    def click_to(self, *args):
+        print("Click element:", args)
+        self.find(*args).click()
 
     def wait_click_to(self, *args):
         print("Click element:", args)
@@ -47,7 +39,6 @@ class Selen:
     def wait_find(self, *args):
         print("Looking for :", args)
         try:
-            print("args[]", args[0])
             elem = self.WD.find_element(*args[0])
         except NoSuchElementException:
             print("Element not found!")
@@ -57,7 +48,6 @@ class Selen:
             return None
 
         for by in args[1:]:
-            print("BY", by)
             try:
                 elem = elem.find_element(*by)
             except NoSuchElementException:
@@ -69,7 +59,6 @@ class Selen:
         elem = self.WD
         for by in args:
             try:
-                print("by", by)
                 elem = elem.find_element(*by)
             except NoSuchElementException:
                 print("Element not found!")
@@ -86,6 +75,18 @@ class Selen:
         elem = self.find(*args)
         elem.click()
         elem.send_keys(text)
+
+    def check_title(self, title):
+        if self.WD.title != title:
+            print("!!Wrong title at:", self.WD.title)
+            print("Got:", self.WD.title)
+            print("Expected:", title)
+
+    def check_url(self, url):
+        if self.WD.current_url != url:
+            print("!!Wrong URL!!")
+            print("Got:", self.WD.current_url)
+            print("Expected:", url)
 
 
     # def get_elem(self, find_func):
