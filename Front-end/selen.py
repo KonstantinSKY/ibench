@@ -15,6 +15,8 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.edge.service import Service as EdgeService
 
+from security import COOKIES
+
 class Selen:
 
     def __init__(self, wd="Chrome", headless=False):
@@ -41,7 +43,8 @@ class Selen:
             opts.binary_location = '/opt/microsoft/msedge/msedge'
             opts.add_argument('--start-maximized')
             self.WD = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=opts)
-
+        
+        self.wd_name = wd
         self.WD.maximize_window()
         self.WD.act_chain = ActionChains(self)
         self.WDW = WebDriverWait(self.WD, 10)
@@ -100,7 +103,7 @@ class Selen:
 
     def check_title(self, title):
         if self.WD.title != title:
-            print("!!Wrong title at:", self.WD.title)
+            print("!!Wrong title at:", self.WD.current_url)
             print("Got:", self.WD.title)
             print("Expected:", title)
 
@@ -111,8 +114,12 @@ class Selen:
             print("Expected:", url)
 
     def save_cookies_to_file(self, file_name):
+        if self.wd_name in COOKIES and COOKIES[self.wd_name] == self.WD.get_cookies:
+            print("cookies found")
+            return
+        COOKIES[self.wd_name] = self.WD.get_cookies()
         with open(file_name, 'a') as f:
-            f.write(f'COOKIES = {self.WD.get_cookies()}\n')
+            f.write(f'COOKIES = {COOKIES}\n')
 
 
     # def get_elem(self, find_func):
