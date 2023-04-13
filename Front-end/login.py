@@ -14,11 +14,18 @@ class Login(Selen):
     l_login_submit_btn_wrapper = ("class name", "Login_submit_wrapper__2-PYe")
     l_login_submit_btn = ("tag name", "button")
 
-    def __init__(self, wd):
+    def __init__(self, wd="Chrome"):
         super().__init__(wd)
         self.url = "https://ibench.net/"
 
-    # def
+    def login(self):
+        pass
+
+    def registration(self):
+        pass
+
+    def recovery_password(self):
+
 
     def main(self):
         self.WD.get(self.url)
@@ -37,42 +44,5 @@ class Login(Selen):
         self.WD.close()
 
 
-class Chrome_Login(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.cls = Login("Chrome")
-
-    def test_login(self):
-        self.cls.main()
-
-    def tearDown(self) -> None:
-        self.cls = None
-
-
-class Firefox_Login(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.cls = Login("Firefox")
-
-    def test_login(self):
-        self.cls.main()
-
-    def tearDown(self) -> None:
-        self.cls = None
-
-
-class Edge_Login(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.cls = Login("Edge")
-
-    def test_login(self):
-        self.cls.main()
-
-    def tearDown(self) -> None:
-        self.cls = None
-
-
 if __name__ == "__main__":
-    pass
-    # Login().main()
+    Login().main()
