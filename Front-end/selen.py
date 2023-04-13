@@ -17,6 +17,7 @@ from selenium.webdriver.edge.service import Service as EdgeService
 
 from security import COOKIES
 
+
 class Selen:
 
     def __init__(self, wd="Chrome", headless=False):
@@ -43,7 +44,7 @@ class Selen:
             opts.binary_location = '/opt/microsoft/msedge/msedge'
             opts.add_argument('--start-maximized')
             self.WD = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=opts)
-        
+
         self.wd_name = wd
         self.WD.maximize_window()
         self.WD.act_chain = ActionChains(self)
@@ -113,14 +114,17 @@ class Selen:
             print("Got:", self.WD.current_url)
             print("Expected:", url)
 
+    def check_text(self, text):
+        pass
+
+
     def save_cookies_to_file(self, file_name):
-        if self.wd_name in COOKIES and COOKIES[self.wd_name] == self.WD.get_cookies:
+        if self.wd_name in COOKIES:
             print("cookies found")
             return
         COOKIES[self.wd_name] = self.WD.get_cookies()
         with open(file_name, 'a') as f:
             f.write(f'COOKIES = {COOKIES}\n')
-
 
     # def get_elem(self, find_func):
     #     self.WD.get(self.url + self.link)
@@ -156,11 +160,4 @@ class Selen:
 
 
 if __name__ == '__main__':
-    # S = Dappradar()
-    # print(sorted(S.__dict__))
-    # print(sorted(S.__dir__()))
-    # S.get("https://dappradar.com/rankings/category/games")
-    Dappradar().main()
-    time.sleep(5)
-    Dappradar().get("https://dappradar.com/multichain/games/alien-worlds")
     time.sleep(15)
