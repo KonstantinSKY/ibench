@@ -1,7 +1,7 @@
 from selen import Selen
+from selen import TAG, CLASS, XPATH
 from time import sleep
 from security import EMAIL, PASSW
-import unittest
 
 
 class Login(Selen):
@@ -15,6 +15,10 @@ class Login(Selen):
     l_login_submit_btn_wrapper = ("class name", "Login_submit_wrapper__2-PYe")
     l_login_submit_btn = ("tag name", "button")
 
+    l_fp_registration = (CLASS, "FrontPage_registrationLinks__2DkiO")
+    l_btn_wrap = (CLASS, "FrontPage_btnWrapper__2Q75S")
+    l_btn = (TAG, "a")
+    
     def __init__(self, wd="Chrome"):
         super().__init__(wd)
         self.url = "https://ibench.net/"
@@ -28,6 +32,10 @@ class Login(Selen):
         self.check_title("iBench - real-time developers Hiring")
         self.check_url("https://ibench.net/")
         self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
+        print(self.wait_find(self.l_fp_registration, self.l_btn_wrap, self.l_btn).text)
+        print(self.wait_find(self.l_fp_registration).text)
+        sleep(10)
+
         pass
 
     def login(self):
@@ -61,4 +69,4 @@ class Login(Selen):
 
 
 if __name__ == "__main__":
-    Login().login()
+    Login().main_page()
