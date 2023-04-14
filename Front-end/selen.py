@@ -17,6 +17,10 @@ from selenium.webdriver.edge.service import Service as EdgeService
 
 from security import COOKIES
 
+TAG = "tag name"
+XPATH = "xpath"
+CLASS = "class name"
+
 
 class Selen:
 
@@ -59,7 +63,6 @@ class Selen:
             self.WD.execute_cdp_cmd('Network.setCookie', cookie)
             # self.WD.add_cookie(cookie)
 
-
     def print(self, *args, **kwargs):
         if self.print_ok:
             print(*args, **kwargs)
@@ -88,22 +91,21 @@ class Selen:
             print("Command timed out!")
             self.assertion()
             return None
-
-        for by in args[1:]:
-            try:
-                elem = elem.find_element(*by)
-            except NoSuchElementException:
-                print("!!! Element not found: ", by)
-                self.assertion()
-                return None
+        print(args[1:])
+        if args[1:]:
+            elem = self.find_in(elem, *args[1:])
 
         self.elem = elem
         return elem
 
     def find(self, *args):
         elem = self.WD
+        return self.find_in(elem, *args)
+
+    def find_in(self, elem, *args):
         for by in args:
             try:
+                print(by)
                 elem = elem.find_element(*by)
             except NoSuchElementException:
                 print("Element not found!")
@@ -171,9 +173,6 @@ class Selen:
         with open(file_name, 'a') as f:
             f.write(f'COOKIES = {COOKIES}\n')
             self.print("Cookies saved")
-
-
-
 
     # def get_elem(self, find_func):
     #     self.WD.get(self.url + self.link)
