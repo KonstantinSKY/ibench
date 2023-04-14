@@ -6,6 +6,7 @@ import unittest
 
 class Login(Selen):
     # locators
+    l_h1 = ("tag name", "h1")   # first header H1
     l_login_btn = ("class name", "Navigation_login__JL_4K")
     l_login_field = (
         "xpath", "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[1]/input[1]")
@@ -26,13 +27,28 @@ class Login(Selen):
         self.WD.get(self.url)
         self.check_title("iBench - real-time developers Hiring")
         self.check_url("https://ibench.net/")
+        self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
         pass
 
     def login(self):
-        pass
+        self.main_page()
+        self.wait_click_to(self.l_login_btn)
+        sleep(1)
+        self.check_url("https://ibench.net/login")
+        self.check_title("Log in | iBench - real-time developers Hiring")
+        self.text_to(EMAIL, self.l_login_field)
+        self.text_to(PASSW, self.l_password_field)
+        self.click_to(self.l_login_submit_btn_wrapper, self.l_login_submit_btn)
+        self.check_wait_text("Daily updates", self.l_h1)
+        self.check_url("https://ibench.net/stats")
+        self.check_title("Daily updates | iBench - real-time developers Hiring")
+        sleep(5)
 
     def login_cookies(self):
-        pass
+        self.add_cookies()
+        self.WD.get(self.url)
+        sleep(20)
+        # self.main_page()
 
     def registration(self):
         pass
@@ -41,25 +57,8 @@ class Login(Selen):
         pass
 
     def main(self):
-        self.WD.get(self.url)
-        print("\n")
-        self.check_title("iBench - real-time developers Hiring")
-        self.check_url("https://ibench.net/")
-        self.wait_click_to(self.l_login_btn)
-
-        sleep(1)
-        self.check_url("https://ibench.net/login")
-        self.check_title("Log in | iBench - real-time developers Hiring")
-        self.text_to(EMAIL, self.l_login_field)
-        self.text_to(PASSW, self.l_password_field)
-        self.click_to(self.l_login_submit_btn_wrapper, self.l_login_submit_btn)
-        self.save_cookies_to_file("security.py")
-
-        #check result
-
-        sleep(10)
         self.WD.close()
 
 
 if __name__ == "__main__":
-    Login().main()
+    Login().login()
