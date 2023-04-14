@@ -1,11 +1,11 @@
 import unittest
-from login import Login
+from ibench import iBench as Cls
 
 
 class Chrome_Login(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.cls = Login("Chrome")
+        self.cls = Cls("Chrome")
 
     def test_login(self):
         self.cls.login()
@@ -18,7 +18,7 @@ class Chrome_Login(unittest.TestCase):
 class Firefox_Login(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.cls = Login("Firefox")
+        self.cls = Cls("Firefox")
 
     def test_login(self):
         self.cls.login()
@@ -31,7 +31,7 @@ class Firefox_Login(unittest.TestCase):
 class Edge_Login(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.cls = Login("Edge")
+        self.cls = Cls("Edge")
 
     def test_login(self):
         self.cls.login()
