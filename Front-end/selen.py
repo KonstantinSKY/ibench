@@ -50,6 +50,8 @@ class Selen:
         self.WD.act_chain = ActionChains(self)
         self.WDW = WebDriverWait(self.WD, 10)
         self.url = ""
+        self.assertions = True
+        self.print_ok = True
 
     def click_to(self, *args):
         # print("Click element:", args)
@@ -102,21 +104,30 @@ class Selen:
         elem.clear()
         elem.send_keys(text)
 
+    def checker(self, got, expect, message):
+
+        if self.assertions:
+            assert got == expect, f"!!! Wrong {message}"
+        else:
+            try:
+                assert got == expect, message
+            except AssertionError:
+                print("!!! Wrong", message)
+                print("Got:", got)
+                print("Expected:", expect)
+                return
+
+        if self.print_ok:
+            print("Checked:", message, "is OK")
+
     def check_title(self, title):
-        if self.WD.title != title:
-            print("!!Wrong title at:", self.WD.current_url)
-            print("Got:", self.WD.title)
-            print("Expected:", title)
+        self.checker(self.WD.title, title, f"!!Wrong title at: {self.WD.current_url}")
 
     def check_url(self, url):
-        if self.WD.current_url != url:
-            print("!!Wrong URL!!")
-            print("Got:", self.WD.current_url)
-            print("Expected:", url)
+        self.checker(self.WD.current_url, url, "!!! Wrong URL")
 
     def check_text(self, text):
         pass
-
 
     def save_cookies_to_file(self, file_name):
         if self.wd_name in COOKIES:
