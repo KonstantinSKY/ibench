@@ -50,35 +50,54 @@ class Selen:
         self.WD.act_chain = ActionChains(self)
         self.WDW = WebDriverWait(self.WD, 10)
         self.url = ""
-        self.assertions = True
+        self.elem = self.WD
+        self.assert_ok = True
         self.print_ok = True
 
+    def add_cookies(self):
+        for cookie in COOKIES[self.wd_name]:
+            self.WD.execute_cdp_cmd('Network.setCookie', cookie)
+            # self.WD.add_cookie(cookie)
+
+
+    def print(self, *args, **kwargs):
+        if self.print_ok:
+            print(*args, **kwargs)
+
+    def assertion(self):
+        if self.assert_ok:
+            assert False
+
     def click_to(self, *args):
-        # print("Click element:", args)
         self.find(*args).click()
+        self.print("Clicked element:", self.elem)
 
     def wait_click_to(self, *args):
-        # print("Click element:", args)
         self.wait_find(*args).click()
+        self.print("Clicked element:", self.elem)
 
     def wait_find(self, *args):
-        print("Looking for :", args)
+        self.print("Looking for :", args)
         try:
             elem = self.WDW.until(EC.presence_of_element_located(args[0]))
-            # elem = self.WD.find_element(*args[0])
         except NoSuchElementException:
             print("Element not found!")
+            self.assertion()
             return None
         except TimeoutException:
             print("Command timed out!")
+            self.assertion()
             return None
 
         for by in args[1:]:
             try:
                 elem = elem.find_element(*by)
             except NoSuchElementException:
-                print("Element not found!")
+                print("!!! Element not found: ", by)
+                self.assertion()
                 return None
+
+        self.elem = elem
         return elem
 
     def find(self, *args):
@@ -88,25 +107,27 @@ class Selen:
                 elem = elem.find_element(*by)
             except NoSuchElementException:
                 print("Element not found!")
+                self.assertion()
+                return None
+        self.elem = elem
         return elem
 
+    def send_text(self, text):
+        self.elem.click()
+        self.elem.clear()
+        self.elem.send_keys(text)
+        self.print("Text sent:", text)
+
     def wait_text_to(self, text: str, *args):
-        print("Texting..")
-        elem = self.wait_find(*args)
-        print(elem)
-        elem.click()
-        elem.clear()
-        elem.send_keys(text)
+        self.elem = self.wait_find(*args)
+        self.send_text(text)
 
     def text_to(self, text: str, *args):
-        elem = self.find(*args)
-        elem.click()
-        elem.clear()
-        elem.send_keys(text)
+        self.elem = self.find(*args)
+        self.send_text(text)
 
     def checker(self, got, expect, message):
-
-        if self.assertions:
+        if self.assert_ok:
             assert got == expect, f"!!! Wrong {message}"
         else:
             try:
@@ -118,24 +139,41 @@ class Selen:
                 return
 
         if self.print_ok:
-            print("Checked:", message, "is OK")
+            self.print("Checked:", message, "is OK")
 
     def check_title(self, title):
-        self.checker(self.WD.title, title, f"!!Wrong title at: {self.WD.current_url}")
+        self.checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
 
     def check_url(self, url):
-        self.checker(self.WD.current_url, url, "!!! Wrong URL")
+        self.checker(self.WD.current_url, url, "URL")
 
-    def check_text(self, text):
-        pass
+    def check_text(self, text, *args):
+        if args:
+            elem = self.find(*args)
+        else:
+            elem = self.elem.find_element("tag name", "html")
+
+        self.checker(elem.text, text, f"Text at elements: {elem}")
+
+    def check_wait_text(self, text, *args):
+        if args:
+            elem = self.wait_find(*args)
+        else:
+            elem = self.elem
+
+        self.checker(elem.text, text, f"Text at waited elements: {elem}")
 
     def save_cookies_to_file(self, file_name):
         if self.wd_name in COOKIES:
-            print("cookies found")
+            self.print("Cookies found")
             return
         COOKIES[self.wd_name] = self.WD.get_cookies()
         with open(file_name, 'a') as f:
             f.write(f'COOKIES = {COOKIES}\n')
+            self.print("Cookies saved")
+
+
+
 
     # def get_elem(self, find_func):
     #     self.WD.get(self.url + self.link)
