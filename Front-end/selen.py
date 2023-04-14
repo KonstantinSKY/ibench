@@ -151,11 +151,11 @@ class Selen:
         self.elem = self.wait_find(*args)
         self.send_text(text)
 
-    def text_to(self, *args):
-        self.text_to_in(self.WD, *args)
+    def text_to(self, text: str, *args):
+        self.text_to_in(text, self.WD, *args)
 
-    def text_to_in(self, elem, text: str, *args):
-        self.elem = self.find_in(elem, *args)
+    def text_to_in(self, text: str, elem, *args):
+        self.elem = self.find_in(elem, *args) if args else elem
         self.send_text(text)
 
     def checker(self, got, expect, message):
