@@ -26,6 +26,7 @@ class Selen:
 
     def __init__(self, wd="Chrome", headless=False):
 
+        self.elems = None
         self.elem = None
         if wd == "Chrome":
             opts = webdriver.ChromeOptions()
@@ -70,9 +71,13 @@ class Selen:
     def assertion(self):
         if self.assert_ok:
             assert False
-
+    
     def click_to(self, *args):
-        self.find(*args).click()
+        elem = self.WD
+        self.click_to_in(elem, *args)
+        
+    def click_to_in(self, elem, *args):
+        self.find_in(elem, *args).click()
         self.print("Clicked element:", self.elem)
 
     def wait_click_to(self, *args):
@@ -84,14 +89,15 @@ class Selen:
         try:
             elem = self.WDW.until(EC.presence_of_element_located(args[0]))
         except NoSuchElementException:
-            print("Element not found!")
+            print("!!! Element not found: ", args[0])
             self.assertion()
             return None
         except TimeoutException:
+            print("!!! Element not found: ", args[0])
             print("Command timed out!")
             self.assertion()
             return None
-        print(args[1:])
+        self.print("Wait Element found", args[0])
         if args[1:]:
             elem = self.find_in(elem, *args[1:])
 
@@ -105,14 +111,35 @@ class Selen:
     def find_in(self, elem, *args):
         for by in args:
             try:
-                print(by)
                 elem = elem.find_element(*by)
             except NoSuchElementException:
-                print("Element not found!")
+                print("!!! Element not found: ", by)
                 self.assertion()
                 return None
+        self.print("")
         self.elem = elem
         return elem
+
+    def finds(self, *args):
+        elem = self.WD
+        return self.finds_in(elem, *args)
+
+    def finds_in(self, elem, *args) -> list:
+        # print(args)
+        # print(args[:-1])
+        # print(args[-1])
+        # print(len(args))
+        if len(args) > 1:
+            elem = self.find_in(elem, *args[:-1])
+        try:
+            elems = elem.find_elements(*args[-1])
+        except NoSuchElementException:
+            print("!!! Elements not found: ", args[-1])
+            self.assertion()
+            return []
+
+        self.elems = elems
+        return elems
 
     def send_text(self, text):
         self.elem.click()
@@ -124,8 +151,11 @@ class Selen:
         self.elem = self.wait_find(*args)
         self.send_text(text)
 
-    def text_to(self, text: str, *args):
-        self.elem = self.find(*args)
+    def text_to(self, *args):
+        self.text_to_in(self.WD, *args)
+
+    def text_to_in(self, elem, text: str, *args):
+        self.elem = self.find_in(elem, *args)
         self.send_text(text)
 
     def checker(self, got, expect, message):
@@ -165,6 +195,12 @@ class Selen:
 
         self.checker(elem.text, text, f"Text at waited elements: {elem}")
 
+    def check_elem(self, *args):
+        pass
+
+    def check_attr(self, name, value, *args):
+        pass
+
     def save_cookies_to_file(self, file_name):
         if self.wd_name in COOKIES:
             self.print("Cookies found")
@@ -173,38 +209,6 @@ class Selen:
         with open(file_name, 'a') as f:
             f.write(f'COOKIES = {COOKIES}\n')
             self.print("Cookies saved")
-
-    # def get_elem(self, find_func):
-    #     self.WD.get(self.url + self.link)
-    #     self.elem = find_func()
-    #     return self.elem
-    #
-    # def get_elems(self, find_func):
-    #     self.elems = []
-    #     for link in self.links:
-    #         # self.get(self.url + link)
-    #         self.elems.extend(find_func())
-    #         elems = find_func()
-    #         print(len(elems))
-    #         time.sleep(1)
-    #         break
-    #         # print(self.elems)
-    #     return self.elems
-    #
-    # def get_hrefs(self, find_func, norm_func=normalize_link):
-    #     self.get_elems(find_func)
-    #     self.links = sorted([*set([norm_func(elem.get_attribute('href')) for elem in self.elems])])
-    #     return self.links
-    #
-    # @Timer
-    # def get_data(self, find_func):
-    #     for link in self.links:
-    #         self.get(link)
-    #         self.data[link] = find_func()
-    #
-    # def save_to_json(self, file_name):
-    #     with open(file_name, 'w', encoding='utf-8') as f:
-    #         json.dump(self.data, f, indent=4)
 
 
 if __name__ == '__main__':
