@@ -6,7 +6,8 @@ from security import EMAIL, PASSW
 
 class iBench(Selen):
     # locators
-    l_h1 = (TAG, "h1")  # first header H1
+    l_h1 = (TAG, "h1")
+    l_h2 = (TAG, "h2")
     l_login_btn = (CLASS, "Navigation_login__JL_4K")
     l_login_fields = ((CLASS, "Login_form__2mvFD"), (TAG, "input"))
 
@@ -28,19 +29,27 @@ class iBench(Selen):
         self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
 
     def login(self):
-        l_fields = ((CLASS, "Login_form__2mvFD"), (TAG, "input"))
-        l_submit_button = ((CLASS, "Login_submit_wrapper__2-PYe"), (TAG, "button"))
+        lc_fields = ((CLASS, "Login_form__2mvFD"), (TAG, "input"))
+        lc_submit_button = ((CLASS, "Login_submit_wrapper__2-PYe"), (TAG, "button"))
+        lc_validation = ((CLASS, "Login_form__2mvFD"), (CLASS, "form_group"))
+        l_valid = (CLASS, "validation_status_ok")
 
         self.main_page()
         self.wait_click_to(self.l_login_btn)
-        sleep(1)
-
+        self.check_wait_text("Log in", self.l_h2)
         self.check_url("https://ibench.net/login")
         self.check_title("Log in | iBench - real-time developers Hiring")
-        fields = self.finds(*l_fields)
+        fields = self.finds(*lc_fields)
+        validations = self.finds(*lc_validation)
+        print("validations", validations)
+
         self.text_to_in(EMAIL, fields[0])
+        self.check_elem_in("Green checkmark at email", validations[0], l_valid)
+        self.check_attr_in("value", EMAIL, fields[0])
+
         self.text_to_in(PASSW, fields[1])
-        self.click_to(*l_submit_button)
+        self.check_elem_in("Green checkmark at password", validations[1], l_valid)
+        self.click_to(*lc_submit_button)
 
         self.check_wait_text("Daily updates", self.l_h1)
         self.check_url("https://ibench.net/stats")
