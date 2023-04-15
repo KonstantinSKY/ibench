@@ -17,9 +17,14 @@ from selenium.webdriver.edge.service import Service as EdgeService
 
 from security import COOKIES
 
+ID = "id"
 TAG = "tag name"
 XPATH = "xpath"
 CLASS = "class name"
+NAME = "name"
+LINK = "link text"
+PART_LINK = "partial link text"
+CSS = "css selector"
 
 
 class Selen:
@@ -68,9 +73,9 @@ class Selen:
         if self.print_ok:
             print(*args, **kwargs)
 
-    def assertion(self):
+    def assertion(self, message=''):
         if self.assert_ok:
-            assert False
+            assert False, message
     
     def click_to(self, *args):
         elem = self.WD
@@ -85,7 +90,7 @@ class Selen:
         self.print("Clicked element:", self.elem)
 
     def wait_find(self, *args):
-        self.print("Looking for :", args)
+        self.print("Waiting and Looking for :", args)
         try:
             elem = self.WDW.until(EC.presence_of_element_located(args[0]))
         except NoSuchElementException:
@@ -116,7 +121,7 @@ class Selen:
                 print("!!! Element not found: ", by)
                 self.assertion()
                 return None
-        self.print("")
+        # self.print("Element found:", args)
         self.elem = elem
         return elem
 
@@ -138,6 +143,7 @@ class Selen:
             self.assertion()
             return []
 
+        # self.print("Elements found:", args[-1])
         self.elems = elems
         return elems
 
@@ -195,11 +201,28 @@ class Selen:
 
         self.checker(elem.text, text, f"Text at waited elements: {elem}")
 
-    def check_elem(self, *args):
-        pass
+    def check_elem(self, message, *args):
+        self.check_elem_in(message, self.WD, *args)
 
-    def check_attr(self, name, value, *args):
-        pass
+    def check_elem_in(self, message, elem, *args):
+        if self.find_in(elem, *args):
+            self.print(message, ": Element found:", args)
+        else:
+            self.print(message, "!!! Element NOT found:", args)
+
+    def check_attr_in(self, attr, value, elem, *args):
+        real_value = self.find_in(elem, *args).get_attribute(attr)
+        if real_value is None:
+            print("!!! Attribute :", attr, "NOT found")
+            self.assertion('Attribute not found')
+            return None
+        if real_value == value:
+            self.print("Checked: Attribute :", attr, "found and = ", value, " OK")
+        else:
+            print("!!! Attribute :", attr, "found,  but have wrong value")
+            print("Expect:", value)
+            print("Got:", real_value)
+            self.assertion('Attribute have a wrong value')
 
     def save_cookies_to_file(self, file_name):
         if self.wd_name in COOKIES:
