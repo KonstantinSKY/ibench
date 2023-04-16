@@ -5,6 +5,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.remote.webelement import WebElement, BaseWebElement
 
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
@@ -31,8 +32,6 @@ class Selen:
 
     def __init__(self, wd="Chrome", headless=False):
 
-        self.elems = None
-        self.elem = None
         if wd == "Chrome":
             opts = webdriver.ChromeOptions()
             opts.add_argument('--disable-blink-features=AutomationControlled')
@@ -55,12 +54,13 @@ class Selen:
             opts.add_argument('--start-maximized')
             self.WD = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=opts)
 
+        self.elems = []
+        self.elem = WebElement
         self.wd_name = wd
         self.WD.maximize_window()
         self.WD.act_chain = ActionChains(self)
         self.WDW = WebDriverWait(self.WD, 10)
         self.url = ""
-        self.elem = self.WD
         self.assert_ok = True
         self.print_ok = True
 
@@ -74,78 +74,91 @@ class Selen:
             print(*args, **kwargs)
 
     def assertion(self, message=''):
+        print("!!!", message)
         if self.assert_ok:
             assert False, message
-    
-    def click_to(self, *args):
-        elem = self.WD
-        self.click_to_in(elem, *args)
-        
-    def click_to_in(self, elem, *args):
-        self.find_in(elem, *args).click()
-        self.print("Clicked element:", self.elem)
 
-    def wait_click_to(self, *args):
-        self.wait_find(*args).click()
+    def click(self):
+        self.elem.click()
         self.print("Clicked element:", self.elem)
+        return self
 
-    def wait_find(self, *args):
+    def Wait(self, *args):
+        args = self.__args_normalizer(args)
         self.print("Waiting and Looking for :", args)
         try:
             elem = self.WDW.until(EC.presence_of_element_located(args[0]))
         except NoSuchElementException:
-            print("!!! Element not found: ", args[0])
-            self.assertion()
+            self.assertion(f"Element not found: {args[0]}")
             return None
         except TimeoutException:
-            print("!!! Element not found: ", args[0])
             print("Command timed out!")
-            self.assertion()
+            self.assertion(f"Element not found: {args[0]}")
             return None
         self.print("Wait Element found", args[0])
-        if args[1:]:
-            elem = self.find_in(elem, *args[1:])
 
         self.elem = elem
-        return elem
+        self.elems = [self.elem]
+        if args[1:]:
+            self.find(*args[1:])
+
+        return self
+
+    def Find(self, *args):
+        self.elems = self.elem = self.WD
+        self.find(*args)
+        return self
+
+    def __find_one(self, *args: tuple):
+        if not self.elem:
+            self.assertion(f"Previous element = {self.elem}. Cant to find next {args} element")
+            return
+            # trying to find element
+        try:
+            elems = self.elem.find_elements(*args[:2])
+        except NoSuchElementException:
+            self.assertion(f"Element(s) not found: {args}")
+            return
+            # Check if list of number of element present
+        if len(args) == 3 and isinstance(args[2], list) and all(isinstance(item, int) for item in args[2]):
+            try:
+                new_elems = [elems[i] for i in args[2]]
+                elems = new_elems
+            except IndexError:
+                # self.assertion(f"Indexes of Elements incorrect: {args[2]}")
+                pass
+        self.elems = elems
+        if self.elems:
+            self.elem = self.elems[0]
+            print("elems:", self.elems)
+            print("elem", self.elem)
+            return
+
+        self.elem = None
+        self.assertion(f"Element(s) not found: {args}, elems: {self.elems}, elem: {self.elem}")
+        return
+
+    def __get_tuple_depth(self, t):
+        if isinstance(t, tuple):
+            return 1 + max(self.__get_tuple_depth(i) for i in t)
+        else:
+            return 0
+
+    def __args_normalizer(self, *args):
+        # print("deep", self.__get_tuple_depth(args))
+        # print("Start args", args)
+        for i in range(self.__get_tuple_depth(args) - 2):
+            args = sum(args, ())
+        # print("Normaliser:", args)
+        return args
 
     def find(self, *args):
-        elem = self.WD
-        return self.find_in(elem, *args)
-
-    def find_in(self, elem, *args):
+        args = self.__args_normalizer(args)
         for by in args:
-            try:
-                elem = elem.find_element(*by)
-            except NoSuchElementException:
-                print("!!! Element not found: ", by)
-                self.assertion()
-                return None
-        # self.print("Element found:", args)
-        self.elem = elem
-        return elem
+            print(by)
+            self.__find_one(*by)
 
-    def finds(self, *args):
-        elem = self.WD
-        return self.finds_in(elem, *args)
-
-    def finds_in(self, elem, *args) -> list:
-        # print(args)
-        # print(args[:-1])
-        # print(args[-1])
-        # print(len(args))
-        if len(args) > 1:
-            elem = self.find_in(elem, *args[:-1])
-        try:
-            elems = elem.find_elements(*args[-1])
-        except NoSuchElementException:
-            print("!!! Elements not found: ", args[-1])
-            self.assertion()
-            return []
-
-        # self.print("Elements found:", args[-1])
-        self.elems = elems
-        return elems
+        return self
 
     def send_text(self, text):
         self.elem.click()
@@ -164,42 +177,33 @@ class Selen:
         self.elem = self.find_in(elem, *args) if args else elem
         self.send_text(text)
 
-    def checker(self, got, expect, message):
-        if self.assert_ok:
-            assert got == expect, f"!!! Wrong {message}"
-        else:
-            try:
-                assert got == expect, message
-            except AssertionError:
-                print("!!! Wrong", message)
-                print("Got:", got)
-                print("Expected:", expect)
-                return
+    def __checker(self, got, expect, message='') -> bool:
 
-        if self.print_ok:
-            self.print("Checked:", message, "is OK")
+        if got == expect:
+            self.print("Checked:",  message, "...OK")
+            return True
 
-    def check_title(self, title):
-        self.checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
+        self.assertion(f"!!! Wrong {message}")
+        print("Got:", got)
+        print("Expected:", expect)
+        return False
+
+    def check_title(self, title=''):
+        if title:
+            return self.__checker(self.elem.text, title, f"Title at: {self.WD.current_url}")
+
+        return self.elem.text
+        
+        self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
 
     def check_url(self, url):
-        self.checker(self.WD.current_url, url, "URL")
+        self.__checker(self.WD.current_url, url, "URL")
 
-    def check_text(self, text, *args):
-        if args:
-            elem = self.find(*args)
-        else:
-            elem = self.elem.find_element("tag name", "html")
+    def text(self, text=''):
+        if text:
+            return self.__checker(self.elem.text, text, f"Text at elements: {self.elem}")
 
-        self.checker(elem.text, text, f"Text at elements: {elem}")
-
-    def check_wait_text(self, text, *args):
-        if args:
-            elem = self.wait_find(*args)
-        else:
-            elem = self.elem
-
-        self.checker(elem.text, text, f"Text at waited elements: {elem}")
+        return self.elem.text
 
     def check_elem(self, message, *args):
         self.check_elem_in(message, self.WD, *args)
@@ -223,6 +227,42 @@ class Selen:
             print("Expect:", value)
             print("Got:", real_value)
             self.assertion('Attribute have a wrong value')
+
+    def Tag(self, tag_name):
+        self.elems = self.elem = self.WD
+        self.tag(tag_name)
+        return self
+
+    def tag(self, tag_name):
+        self.elems = self.elem.find_elements(TAG, tag_name)
+        if not self.elems:
+            message = f"Elements not found by TAG NAME: {tag_name}"
+            print("!!!", message)
+            self.assertion(message)
+            self.elem = None
+            return None
+        self.elem = self.elems[0]
+        return self
+
+    def text1(self, text):
+        elems = []
+        for elem in self.elems:
+            print(elem.text, text)
+            if elem.text != text:
+                continue
+            elems.append(elem)
+
+        print("elems:", elems)
+        self.elems = elems
+        self.elem = self.elems[0] if self.elems else None
+
+        print("elem:", self.elem)
+        print("Filtering by text:", text)
+        # return an instance of the same class
+        return self
+
+    # def click(self):
+    #     self.elem.click()
 
     def save_cookies_to_file(self, file_name):
         if self.wd_name in COOKIES:
