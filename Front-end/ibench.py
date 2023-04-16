@@ -53,7 +53,7 @@ class iBench(Selen):
         self.current_url("https://ibench.net/login")
         self.title("Log in | iBench - real-time developers Hiring")
 
-        self.Find(NAME, "email").type(EMAIL).attr('value', EMAIL)
+        self.Find(NAME, "email").type(EMAIL).sleep(2, 4).attr('value', EMAIL)
 
         # validations = self.finds(*lc_validation)
 
