@@ -13,6 +13,7 @@ class iBench(Selen):
 
     l_fp_registration = (CLASS, "FrontPage_registrationLinks__2DkiO")
     l_btn_wrap = (CLASS, "FrontPage_btnWrapper__2Q75S")
+    l_check_button = (CLASS, 'FrontPage_btnWrapper__2Q75S')
     l_btn = (TAG, "a")
 
     def __init__(self, wd="Chrome"):
@@ -24,15 +25,25 @@ class iBench(Selen):
 
     def main_page(self):
         self.WD.get(self.url)
+        print(self.Wait(self.l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?'))
+        # self.click()
+        sleep(10)
         self.check_title("iBench - real-time developers Hiring")
         self.check_url("https://ibench.net/")
-        self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
+        # self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
+        # print(self.Tag("a").text1("Log in").elem)
+        # self.Find(self.l_fp_registration)
+        # self.Find(CLASS, 'FrontPage_btnWrapper__2Q75S')
+        self.Find(CLASS, 'FrontPage_btnWrapper__2Q75S', [0])
+        # self.Find(self.l_login_btn)
+        # self.Find(self.l_login_fields)
+        # # self.Find(self.l_check_button, self.l_btn_wrap)
 
     def login(self):
         lc_fields = ((CLASS, "Login_form__2mvFD"), (TAG, "input"))
         lc_submit_button = ((CLASS, "Login_submit_wrapper__2-PYe"), (TAG, "button"))
         lc_validation = ((CLASS, "Login_form__2mvFD"), (CLASS, "form_group"))
-        l_valid = (CLASS, "validation_status_ok")
+        l_valid = (CLASS, "FrontPage_registrationLinks__2DkiO")
 
         self.main_page()
         self.wait_click_to(self.l_login_btn)
@@ -73,5 +84,5 @@ class iBench(Selen):
 
 
 if __name__ == "__main__":
-    iBench().login()
+    iBench().main_page()
     sleep(10)
