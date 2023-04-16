@@ -53,8 +53,8 @@ class iBench(Selen):
         self.current_url("https://ibench.net/login")
         self.title("Log in | iBench - real-time developers Hiring")
 
-        self.Find(NAME, "email").type(EMAIL).sleep(2, 4).attr('value', EMAIL)
-
+        self.Find(NAME, "email").type(EMAIL).sleep(0.2, 0.4).attr('value', EMAIL)
+        self.Find(NAME, "email").parent(1).find(TAG, 'span').attr('class', 'validation_status_ok')
         # validations = self.finds(*lc_validation)
 
         # print("validations", validations)
