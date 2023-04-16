@@ -200,14 +200,14 @@ class Selen:
 
         return self.elem.text
 
-    def check_elem(self, message, *args):
-        self.check_elem_in(message, self.WD, *args)
-
-    def check_elem_in(self, message, elem, *args):
-        if self.find_in(elem, *args):
-            self.print(message, ": Element found:", args)
-        else:
-            self.print(message, "!!! Element NOT found:", args)
+    def parent(self, levels=1):
+        for i in range(levels):
+            try:
+                self.elem = self.elem.find_element(XPATH, '..')
+                self.elems = [self.elem]
+            except NoSuchElementException:
+                self.assertion(f"Parent Element at level {i} not found")
+        return self
 
     def type(self, text=None):
         self.elem.click()
@@ -216,8 +216,8 @@ class Selen:
         return self
 
     def attr(self, attr, value=None):
-
         real_value = self.elem.get_attribute(attr)
+
         if real_value is None:
             print("!!! Attribute :", attr, "NOT found")
             self.assertion('Attribute not found')
