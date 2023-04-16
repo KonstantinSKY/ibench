@@ -77,9 +77,12 @@ class Selen:
 
     def sleep(self, seconds, finish=None):
         if finish is None:
+            self.print("Sleeping for:", seconds, "seconds")
             time.sleep(seconds)
             return self
 
+        delay = uniform(seconds, finish)
+        self.print("Sleeping for:", delay, "seconds")
         time.sleep(uniform(seconds, finish))
         return self
 
@@ -205,6 +208,12 @@ class Selen:
             self.print(message, ": Element found:", args)
         else:
             self.print(message, "!!! Element NOT found:", args)
+
+    def type(self, text=None):
+        self.elem.click()
+        self.elem.clear()
+        self.elem.send_keys(text)
+        return self
 
     def attr(self, attr, value=None):
 
