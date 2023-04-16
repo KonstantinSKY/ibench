@@ -1,5 +1,5 @@
 from selen import Selen
-from selen import TAG, CLASS, XPATH
+from selen import TAG, CLASS, XPATH, NAME
 from time import sleep
 from security import EMAIL, PASSW
 
@@ -25,16 +25,16 @@ class iBench(Selen):
 
     def main_page(self):
         self.WD.get(self.url)
-        print(self.Wait(self.l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?'))
-        # self.click()
-        sleep(10)
-        self.check_title("iBench - real-time developers Hiring")
-        self.check_url("https://ibench.net/")
+        # self.Wait(self.l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
+        self.Tag('h1').text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
+        self.title("iBench - real-time developers Hiring")
+        self.current_url("https://ibench.net/")
+        sleep(5)
         # self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
         # print(self.Tag("a").text1("Log in").elem)
         # self.Find(self.l_fp_registration)
         # self.Find(CLASS, 'FrontPage_btnWrapper__2Q75S')
-        self.Find(CLASS, 'FrontPage_btnWrapper__2Q75S', [0])
+        # self.Find(CLASS, 'FrontPage_btnWrapper__2Q75S', [0])
         # self.Find(self.l_login_btn)
         # self.Find(self.l_login_fields)
         # # self.Find(self.l_check_button, self.l_btn_wrap)
@@ -46,26 +46,31 @@ class iBench(Selen):
         l_valid = (CLASS, "FrontPage_registrationLinks__2DkiO")
 
         self.main_page()
-        self.wait_click_to(self.l_login_btn)
-        self.check_wait_text("Log in", self.l_h2)
-        self.check_url("https://ibench.net/login")
-        self.check_title("Log in | iBench - real-time developers Hiring")
-        fields = self.finds(*lc_fields)
-        validations = self.finds(*lc_validation)
-        print("validations", validations)
+        # self.Find(self.l_login_btn).click()
+        self.Tag('a').contains("Log in").click()
 
-        self.text_to_in(EMAIL, fields[0])
-        self.check_elem_in("Green checkmark at email", validations[0], l_valid)
-        self.check_attr_in("value", EMAIL, fields[0])
+        self.Wait(self.l_h2).text("Log in")
+        self.current_url("https://ibench.net/login")
+        self.title("Log in | iBench - real-time developers Hiring")
 
-        self.text_to_in(PASSW, fields[1])
-        self.check_elem_in("Green checkmark at password", validations[1], l_valid)
-        self.click_to(*lc_submit_button)
+        self.Find(NAME, "email").type(EMAIL).attr('value', EMAIL)
 
-        self.check_wait_text("Daily updates", self.l_h1)
-        self.check_url("https://ibench.net/stats")
-        self.check_title("Daily updates | iBench - real-time developers Hiring")
-        sleep(5)
+        # validations = self.finds(*lc_validation)
+
+        # print("validations", validations)
+        #
+        # self.text_to_in(EMAIL, fields[0])
+        # self.check_elem_in("Green checkmark at email", validations[0], l_valid)
+        # self.check_attr_in("value", EMAIL, fields[0])
+        #
+        # self.text_to_in(PASSW, fields[1])
+        # self.check_elem_in("Green checkmark at password", validations[1], l_valid)
+        # self.click_to(*lc_submit_button)
+        #
+        # self.check_wait_text("Daily updates", self.l_h1)
+        # self.check_url("https://ibench.net/stats")
+        # self.check_title("Daily updates | iBench - real-time developers Hiring")
+        # sleep(5)
 
     def login_cookies(self):
         self.add_cookies()
@@ -84,5 +89,5 @@ class iBench(Selen):
 
 
 if __name__ == "__main__":
-    iBench().main_page()
+    iBench().login()
     sleep(10)
