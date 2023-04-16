@@ -1,11 +1,13 @@
 import time
+from random import uniform
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.remote.webelement import WebElement, BaseWebElement
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.by import By
 
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
@@ -73,6 +75,14 @@ class Selen:
         if self.print_ok:
             print(*args, **kwargs)
 
+    def sleep(self, seconds, finish=None):
+        if finish is None:
+            time.sleep(seconds)
+            return self
+
+        time.sleep(uniform(seconds, finish))
+        return self
+
     def assertion(self, message=''):
         print("!!!", message)
         if self.assert_ok:
@@ -130,8 +140,8 @@ class Selen:
         self.elems = elems
         if self.elems:
             self.elem = self.elems[0]
-            print("elems:", self.elems)
-            print("elem", self.elem)
+            # print("elems:", self.elems)
+            # print("elem", self.elem)
             return
 
         self.elem = None
@@ -155,32 +165,14 @@ class Selen:
     def find(self, *args):
         args = self.__args_normalizer(args)
         for by in args:
-            print(by)
             self.__find_one(*by)
 
         return self
 
-    def send_text(self, text):
-        self.elem.click()
-        self.elem.clear()
-        self.elem.send_keys(text)
-        self.print("Text sent:", text)
-
-    def wait_text_to(self, text: str, *args):
-        self.elem = self.wait_find(*args)
-        self.send_text(text)
-
-    def text_to(self, text: str, *args):
-        self.text_to_in(text, self.WD, *args)
-
-    def text_to_in(self, text: str, elem, *args):
-        self.elem = self.find_in(elem, *args) if args else elem
-        self.send_text(text)
-
     def __checker(self, got, expect, message='') -> bool:
 
         if got == expect:
-            self.print("Checked:",  message, "...OK")
+            self.print("Checked:", message, "... OK")
             return True
 
         self.assertion(f"!!! Wrong {message}")
@@ -188,16 +180,16 @@ class Selen:
         print("Expected:", expect)
         return False
 
-    def check_title(self, title=''):
+    def title(self, title=''):
         if title:
-            return self.__checker(self.elem.text, title, f"Title at: {self.WD.current_url}")
+            return self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
 
-        return self.elem.text
-        
-        self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
+        return self.WD.title
 
-    def check_url(self, url):
-        self.__checker(self.WD.current_url, url, "URL")
+    def current_url(self, url=''):
+        if url:
+            return self.__checker(self.WD.current_url, url, "Current_URL ")
+        return self.WD.current_url
 
     def text(self, text=''):
         if text:
@@ -214,19 +206,18 @@ class Selen:
         else:
             self.print(message, "!!! Element NOT found:", args)
 
-    def check_attr_in(self, attr, value, elem, *args):
-        real_value = self.find_in(elem, *args).get_attribute(attr)
+    def attr(self, attr, value=None):
+
+        real_value = self.elem.get_attribute(attr)
         if real_value is None:
             print("!!! Attribute :", attr, "NOT found")
             self.assertion('Attribute not found')
             return None
-        if real_value == value:
-            self.print("Checked: Attribute :", attr, "found and = ", value, " OK")
-        else:
-            print("!!! Attribute :", attr, "found,  but have wrong value")
-            print("Expect:", value)
-            print("Got:", real_value)
-            self.assertion('Attribute have a wrong value')
+
+        if value is None:
+            return real_value
+
+        return self.__checker(real_value, value, f"Attribute: {attr} with value: {value} for elements: {self.elem}")
 
     def Tag(self, tag_name):
         self.elems = self.elem = self.WD
@@ -234,35 +225,31 @@ class Selen:
         return self
 
     def tag(self, tag_name):
-        self.elems = self.elem.find_elements(TAG, tag_name)
-        if not self.elems:
+        elems = self.elem.find_elements(TAG, tag_name)
+        if not elems:
             message = f"Elements not found by TAG NAME: {tag_name}"
             print("!!!", message)
             self.assertion(message)
-            self.elem = None
-            return None
-        self.elem = self.elems[0]
+            elems = []
+        self.elems = elems
+        self.elem = self.elems[0] if self.elems else None
         return self
 
-    def text1(self, text):
+    def contains(self, text):
         elems = []
         for elem in self.elems:
-            print(elem.text, text)
             if elem.text != text:
                 continue
             elems.append(elem)
 
-        print("elems:", elems)
+        # print("elems:", elems)
         self.elems = elems
         self.elem = self.elems[0] if self.elems else None
 
-        print("elem:", self.elem)
-        print("Filtering by text:", text)
+        # print("elem:", self.elem)
+        # print("Filtering by text:", text)
         # return an instance of the same class
         return self
-
-    # def click(self):
-    #     self.elem.click()
 
     def save_cookies_to_file(self, file_name):
         if self.wd_name in COOKIES:
