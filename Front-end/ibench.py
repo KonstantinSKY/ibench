@@ -28,8 +28,11 @@ class iBench(Selen):
         # self.Wait(self.l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
         self.Tag('h1').text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
         self.title("iBench - real-time developers Hiring")
-        self.current_url("https://ibench.net/")
+        self.curr_url("https://ibench.net/")
+        print(self.Get_links(extract=True))
+        self.check_links_a()
         sleep(5)
+
         # self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
         # print(self.Tag("a").text1("Log in").elem)
         # self.Find(self.l_fp_registration)
@@ -50,11 +53,17 @@ class iBench(Selen):
         self.Tag('a').contains("Log in").click()
 
         self.Wait(self.l_h2).text("Log in")
-        self.current_url("https://ibench.net/login")
-        self.title("Log in | iBench - real-time developers Hiring")
+        self.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
 
-        self.Find(NAME, "email").type(EMAIL).sleep(0.2, 0.4).attr('value', EMAIL)
-        self.Find(NAME, "email").parent(1).find(TAG, 'span').attr('class', 'validation_status_ok')
+        # self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span").attr('class', 'validation_status_ok')
+        self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span")
+        self.attr('class', 'validation_status_ok')
+
+        # print(self.elem.get_property('attributes')[0])
+        print(self.Find(NAME, "email").all_attrs())
+        print("CDC", self.Tag("form").count().tag("input").count().contains({'label': 'email', 'value': 'sky012877@gmail.com'}).elems)
+
+        # self.Find(NAME, "email").parent(2).find(TAG, 'span').attr('class', 'validation_status_ok')
         # validations = self.finds(*lc_validation)
 
         # print("validations", validations)
