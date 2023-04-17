@@ -67,6 +67,7 @@ class Selen:
         self.url = ""
         self.assert_ok = True
         self.print_ok = True
+        self.statuses = {}
 
     def __fill_elems(self, data):
         if isinstance(data, list):
@@ -220,7 +221,7 @@ class Selen:
     def parent(self, levels=1):
         for i in range(levels):
             try:
-                self.__fill_elems(self.elem.find_element(XPATH, '..'))
+                self.__fill_elems(self.elem.find_element(By.XPATH, '..'))
             except NoSuchElementException:
                 self.assertion(f"Parent Element at level {i} not found")
         return self
@@ -265,7 +266,7 @@ class Selen:
 
     def tag(self, tag_name: str):
 
-        elems = self.elem.find_elements(TAG, tag_name)
+        elems = self.elem.find_elements(By.TAG_NAME, tag_name)
         if not elems:
             message = f"Elements not found by TAG NAME: {tag_name}"
             print("!!!", message)
@@ -278,67 +279,73 @@ class Selen:
         self.print("Count of Elements:", len(self.elems))
         return self
 
-    def Get_links(self, extract=False):
+    # Links getting
+    def Get_links(self, extract=False, check=False, asynchron=True):
         self.elems = self.elem = self.WD
-        self.get_links(extract)
+        self.get_links(extract, check, asynchron=asynchron)
         return self.links if extract else self
 
-    def get_links(self, extract=False):
+    def get_links(self, extract=False, check=False, asynchron=True):
         self.tag('a')
-        self.links = [elem.get_attribute('href') for elem in self.elems]
+        self.links = list(set([elem.get_attribute('href') for elem in self.elems]))
+        self.links = [link for link in self.links if not link.startswith("mailto:")]
         self.print("Got ", len(self.links), "links, Saved to self.links variable")
+        if check:
+            self.check_links(asynchron=asynchron)
         return self.links if extract else self
-
-    def check_links_sync(self):
-        total = stat200 = 0
-        for link in set(self.links):
-            if link[:6] == 'mailto':
-                continue
-            total += 1
-            try:
-                response = requests.get(link)
-                if response.status_code == 200:
-                    self.print(link, "OK")
-                    stat200 += 1
-                if response.status_code == 404:
-                    print("Broken link found:", link)
-            except:
-                print("Unable to reach:", link)
-        self.print("Checked:", total, ", Status 200 OK is", stat200)
 
     def check_links(self, asynchron=True):
         if asynchron:
-            asyncio.run(self.check_links_async())
+            self.print('Async link checking...')
+            asyncio.run(self.__check_links_async())
         else:
-            self.check_links_async()
-            
-    async def check_links_async(self):
-        total = stat200 = 0
+            self.print('Sync links checking...')
+            self.__check_links_sync()
+
+    # Links checking
+    def __check_links_sync(self):
+        for link in self.links:
+            try:
+                response = requests.get(link)
+                self.__response_stat(link,response.status_code)
+            except:
+                print("Unable to reach:", link)
+        self.__summary_stat()
+
+    async def __check_links_async(self):
         async with aiohttp.ClientSession() as session:
             tasks = []
-
-            for link in set(self.links):
-                if link[:6] == 'mailto':
-                    continue
-                total += 1
-                task = asyncio.create_task(self.check_link_async(link, session))
+            for link in self.links:
+                task = asyncio.create_task(self.__check_link_async(link, session))
                 tasks.append(task)
             responses = await asyncio.gather(*tasks)
-
+            self.statuses = {}
             for response in responses:
-                if response.status == 200:
-                    self.print(response.url, "OK")
-                    stat200 += 1
-                elif response.status == 404:
-                    print("Broken link found:", response.url)
-                else:
-                    print("Unable to reach:", response.url)
-        self.print("Checked:", total, ", Status 200 OK is", stat200)
+                self.__response_stat(response.url, response.status)
+            self.__summary_stat()
 
-    async def check_link_async(self, link, session):
+    async def __check_link_async(self, link, session):
         async with session.get(link) as response:
             return response
 
+    def __summary_stat(self):
+        self.print("Checked:", len(self.links), ", Status 200 OK is", self.statuses[200])
+        self.print("All statuses:", self.statuses)
+
+    def __response_stat(self, url, status):
+        if status in self.statuses:
+            self.statuses[status] += 1
+        else:
+            self.statuses[status] = 1
+
+        if status == 200:
+            self.print(url, "OK")
+        elif status == 404:
+            self.assertion(f"Broken link found: {url}")
+        else:
+            print(f"Unable to reach: {url}")
+
+    # Element filter by contain data
     def Contains(self, data=None):
         self.__fill_elems(self.WD.find_elements(XPATH, "//*"))
         self.print("Count", len(self.elems))
