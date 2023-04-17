@@ -1,5 +1,6 @@
 import time
 from random import uniform
+import requests, asyncio, aiohttp
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
@@ -58,6 +59,7 @@ class Selen:
 
         self.elems = []
         self.elem = WebElement
+        self.links = []
         self.wd_name = wd
         self.WD.maximize_window()
         self.WD.act_chain = ActionChains(self)
@@ -65,6 +67,14 @@ class Selen:
         self.url = ""
         self.assert_ok = True
         self.print_ok = True
+
+    def __fill_elems(self, data):
+        if isinstance(data, list):
+            self.elems = data
+            self.elem = self.elems[0] if self.elems else None
+        else:
+            self.elem = data
+            self.elems = [self.elem]
 
     def add_cookies(self):
         for cookie in COOKIES[self.wd_name]:
@@ -98,20 +108,20 @@ class Selen:
 
     def Wait(self, *args):
         args = self.__args_normalizer(args)
-        self.print("Waiting and Looking for :", args)
+        # self.print("Waiting and Looking for :", args)
         try:
             elem = self.WDW.until(EC.presence_of_element_located(args[0]))
         except NoSuchElementException:
             self.assertion(f"Element not found: {args[0]}")
-            return None
+            return
         except TimeoutException:
             print("Command timed out!")
             self.assertion(f"Element not found: {args[0]}")
-            return None
-        self.print("Wait Element found", args[0])
+            return
 
-        self.elem = elem
-        self.elems = [self.elem]
+        self.print("Wait Element found", args[0], " ... OK")
+        self.__fill_elems(elem)
+
         if args[1:]:
             self.find(*args[1:])
 
@@ -158,11 +168,8 @@ class Selen:
             return 0
 
     def __args_normalizer(self, *args):
-        # print("deep", self.__get_tuple_depth(args))
-        # print("Start args", args)
         for i in range(self.__get_tuple_depth(args) - 2):
             args = sum(args, ())
-        # print("Normaliser:", args)
         return args
 
     def find(self, *args):
@@ -183,28 +190,37 @@ class Selen:
         print("Expected:", expect)
         return False
 
+    def is_title(self, title: str) -> bool:
+        return title == self.WD.title
+
     def title(self, title=''):
         if title:
-            return self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
-
+            self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
+            return self
         return self.WD.title
 
-    def current_url(self, url=''):
+    def is_curr_url(self, url):
+        return url == self.WD.current_url
+
+    def curr_url(self, url=''):
         if url:
-            return self.__checker(self.WD.current_url, url, "Current_URL ")
+            self.__checker(self.WD.current_url, url, "Current_URL ")
+            return self
         return self.WD.current_url
 
-    def text(self, text=''):
-        if text:
-            return self.__checker(self.elem.text, text, f"Text at elements: {self.elem}")
+    def is_text(self, text):
+        return text == self.elem.text
 
-        return self.elem.text
+    def text(self, text=None):
+        if text is None:
+            return self.elem.text
+        self.__checker(self.elem.text, text, f"Text at elements: {self.elem}")
+        return self
 
     def parent(self, levels=1):
         for i in range(levels):
             try:
-                self.elem = self.elem.find_element(XPATH, '..')
-                self.elems = [self.elem]
+                self.__fill_elems(self.elem.find_element(XPATH, '..'))
             except NoSuchElementException:
                 self.assertion(f"Parent Element at level {i} not found")
         return self
@@ -215,45 +231,146 @@ class Selen:
         self.elem.send_keys(text)
         return self
 
+    def is_attr(self, attr, value):
+        return value == self.elem.get_attribute(attr)
+
     def attr(self, attr, value=None):
         real_value = self.elem.get_attribute(attr)
 
         if real_value is None:
             print("!!! Attribute :", attr, "NOT found")
             self.assertion('Attribute not found')
-            return None
+            return self
 
         if value is None:
             return real_value
 
-        return self.__checker(real_value, value, f"Attribute: {attr} with value: {value} for elements: {self.elem}")
+        self.__checker(real_value, value, f"Attribute: {attr} with value: {value} for elements: {self.elem}")
+        return self
 
-    def Tag(self, tag_name):
+    def all_attrs(self) -> dict:
+        attrs = self.WD.execute_script("""
+            var items = {}; 
+            for (index = 0; index < arguments[0].attributes.length; ++index) { 
+                items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value 
+            }; 
+            return items;
+            """, self.elem)
+        return attrs
+
+    def Tag(self, tag_name: str):
         self.elems = self.elem = self.WD
         self.tag(tag_name)
         return self
 
-    def tag(self, tag_name):
+    def tag(self, tag_name: str):
+
         elems = self.elem.find_elements(TAG, tag_name)
         if not elems:
             message = f"Elements not found by TAG NAME: {tag_name}"
             print("!!!", message)
             self.assertion(message)
             elems = []
-        self.elems = elems
-        self.elem = self.elems[0] if self.elems else None
+        self.__fill_elems(elems)
         return self
 
-    def contains(self, text):
-        elems = []
-        for elem in self.elems:
-            if elem.text != text:
-                continue
-            elems.append(elem)
+    def count(self):
+        self.print("Count of Elements:", len(self.elems))
+        return self
 
-        # print("elems:", elems)
-        self.elems = elems
-        self.elem = self.elems[0] if self.elems else None
+    def Get_links(self, extract=False):
+        self.elems = self.elem = self.WD
+        self.get_links(extract)
+        return self.links if extract else self
+
+    def get_links(self, extract=False):
+        self.tag('a')
+        self.links = [elem.get_attribute('href') for elem in self.elems]
+        self.print("Got ", len(self.links), "links, Saved to self.links variable")
+        return self.links if extract else self
+
+    def check_links_sync(self):
+        total = stat200 = 0
+        for link in set(self.links):
+            if link[:6] == 'mailto':
+                continue
+            total += 1
+            try:
+                response = requests.get(link)
+                if response.status_code == 200:
+                    self.print(link, "OK")
+                    stat200 += 1
+                if response.status_code == 404:
+                    print("Broken link found:", link)
+            except:
+                print("Unable to reach:", link)
+        self.print("Checked:", total, ", Status 200 OK is", stat200)
+
+    def check_links(self, asynchron=True):
+        if asynchron:
+            asyncio.run(self.check_links_async())
+        else:
+            self.check_links_async()
+            
+    async def check_links_async(self):
+        total = stat200 = 0
+        async with aiohttp.ClientSession() as session:
+            tasks = []
+
+            for link in set(self.links):
+                if link[:6] == 'mailto':
+                    continue
+                total += 1
+                task = asyncio.create_task(self.check_link_async(link, session))
+                tasks.append(task)
+            responses = await asyncio.gather(*tasks)
+
+            for response in responses:
+                if response.status == 200:
+                    self.print(response.url, "OK")
+                    stat200 += 1
+                elif response.status == 404:
+                    print("Broken link found:", response.url)
+                else:
+                    print("Unable to reach:", response.url)
+        self.print("Checked:", total, ", Status 200 OK is", stat200)
+
+    async def check_link_async(self, link, session):
+        async with session.get(link) as response:
+            return response
+
+    def Contains(self, data=None):
+        self.__fill_elems(self.WD.find_elements(XPATH, "//*"))
+        self.print("Count", len(self.elems))
+        if data is None:
+            return self
+
+        self.contains(data)
+
+    def contains(self, data):
+        elems = []
+        if isinstance(data, dict):
+            for self.elem in self.elems:
+                result = False
+                print("elem", self.elem)
+                for attr, value in data.items():
+                    if not self.is_attr(attr, value):
+                        result = False
+                        print("attr", attr, "not found")
+                        break
+                    result = True
+                    print("attr:", attr, value, "found")
+                if not result:
+                    continue
+                elems.append(self.elem)
+
+        if isinstance(data, str):
+            for elem in self.elems:
+                if elem.text != data:
+                    continue
+                elems.append(elem)
+
+        self.__fill_elems(elems)
 
         # print("elem:", self.elem)
         # print("Filtering by text:", text)
