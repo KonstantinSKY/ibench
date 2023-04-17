@@ -29,8 +29,8 @@ class iBench(Selen):
         self.Tag('h1').text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
         self.title("iBench - real-time developers Hiring")
         self.curr_url("https://ibench.net/")
-        print(self.Get_links(extract=True))
-        self.check_links_a()
+        print(self.Get_links(check=True, asynchron=False))
+        # self.check_links_a()
         sleep(5)
 
         # self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
