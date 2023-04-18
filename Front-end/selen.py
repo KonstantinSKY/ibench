@@ -1,25 +1,27 @@
 import time
 from random import uniform
-import requests, asyncio, aiohttp
-
+from collections import Counter
+import aiohttp
+import asyncio
+import requests
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.common.by import By
-
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-# from webdriver_manager.safari import SafariDriverManager
-
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.edge.service import Service as EdgeService
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 from security import COOKIES
+from collections import Counter
+
+# from webdriver_manager.safari import SafariDriverManager
 
 ID = "id"
 TAG = "tag name"
@@ -57,9 +59,17 @@ class Selen:
             opts.add_argument('--start-maximized')
             self.WD = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=opts)
 
+        elif wd == "Opera":
+            pass
+
+        else:
+            print('!!! WebDriver for: ', wd, " does NOT Exits in the system.")
+            exit()
+
         self.elems = []
         self.elem = WebElement
         self.links = []
+        self.images = []
         self.wd_name = wd
         self.WD.maximize_window()
         self.WD.act_chain = ActionChains(self)
@@ -67,7 +77,7 @@ class Selen:
         self.url = ""
         self.assert_ok = True
         self.print_ok = True
-        self.statuses = {}
+        self.stat = {}
 
     def __fill_elems(self, data):
         if isinstance(data, list):
@@ -249,22 +259,53 @@ class Selen:
         self.__checker(real_value, value, f"Attribute: {attr} with value: {value} for elements: {self.elem}")
         return self
 
-    def all_attrs(self) -> dict:
+    def all_attrs(self, elem=None) -> dict:
+        elem = self.elem if elem is None else elem
         attrs = self.WD.execute_script("""
             var items = {}; 
             for (index = 0; index < arguments[0].attributes.length; ++index) { 
                 items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value 
             }; 
             return items;
-            """, self.elem)
+            """, elem)
         return attrs
+
+    def xpath(self, elem=None) -> str or None:
+        elem = self.elem if elem is None else elem
+        xpath = self.WD.execute_script("""
+                var xpath = "";
+                var containerElem = document.documentElement;
+                var elem = arguments[0];
+
+                while (elem !== containerElem) {
+                    var index = 0;
+                    var sibling = elem.previousSibling;
+
+                    while (sibling) {
+                        if (sibling.nodeType === Node.ELEMENT_NODE && 
+                            sibling.nodeName.toLowerCase() === elem.nodeName.toLowerCase()) {
+                            index++;
+                        }
+                        sibling = sibling.previousSibling;
+                    }
+                    xpath = "/" + elem.nodeName.toLowerCase() + "[" + (index + 1) + "]" + xpath;
+                    elem = elem.parentNode;
+                }
+                return "/" + containerElem.nodeName.toLowerCase() + xpath;
+        """, elem)  # Checking for correct XPATH
+        try:
+            self.WD.find_element(XPATH, xpath)
+            return xpath
+        except NoSuchElementException:
+            self.assertion(f"!!! Found Incorrect abs XPATH, Got {xpath} but Can not to find Element by it")
+            return None
 
     def Tag(self, tag_name: str):
         self.elems = self.elem = self.WD
         self.tag(tag_name)
         return self
 
-    def tag(self, tag_name: str):
+    def tag(self, tag_name: str, extract=False):
 
         elems = self.elem.find_elements(By.TAG_NAME, tag_name)
         if not elems:
@@ -273,7 +314,7 @@ class Selen:
             self.assertion(message)
             elems = []
         self.__fill_elems(elems)
-        return self
+        return self.elems if extract else self
 
     def count(self):
         self.print("Count of Elements:", len(self.elems))
@@ -286,9 +327,14 @@ class Selen:
         return self.links if extract else self
 
     def get_links(self, extract=False, check=False, asynchron=True):
+        self.links = []
         self.tag('a')
-        self.links = list(set([elem.get_attribute('href') for elem in self.elems]))
-        self.links = [link for link in self.links if not link.startswith("mailto:")]
+        for link in self.elems:
+            if link.get_attribute('href'):
+                self.links.append(link.get_attribute('href'))
+            else:
+                print(f"!!! Incorrect link: No attribute 'href', xpath: {self.xpath(link)}")
+        self.links = list(set([link for link in self.links if not link.startswith("mailto:")]))
         self.print("Got ", len(self.links), "links, Saved to self.links variable")
         if check:
             self.check_links(asynchron=asynchron)
@@ -304,10 +350,11 @@ class Selen:
 
     # Links checking
     def __check_links_sync(self):
+        self.stat = {}
         for link in self.links:
             try:
                 response = requests.get(link)
-                self.__response_stat(link,response.status_code)
+                self.__response_stat(link, response.status_code)
             except:
                 print("Unable to reach:", link)
         self.__summary_stat()
@@ -319,7 +366,7 @@ class Selen:
                 task = asyncio.create_task(self.__check_link_async(link, session))
                 tasks.append(task)
             responses = await asyncio.gather(*tasks)
-            self.statuses = {}
+            self.stat = {}
             for response in responses:
                 self.__response_stat(response.url, response.status)
             self.__summary_stat()
@@ -329,15 +376,13 @@ class Selen:
             return response
 
     def __summary_stat(self):
-        self.print("Checked:", len(self.links), ", Status 200 OK is", self.statuses[200])
-        self.print("All statuses:", self.statuses)
+        counts = Counter(self.stat.values())
+        self.print("Checked:", len(self.links), ", Status 200 OK is", counts[200])
+        self.print("All statuses:", self.stat)
 
     def __response_stat(self, url, status):
-        if status in self.statuses:
-            self.statuses[status] += 1
-        else:
-            self.statuses[status] = 1
-
+        self.stat[url] = status
+        print(len(self.stat))
         if status == 200:
             self.print(url, "OK")
         elif status == 404:
@@ -383,6 +428,58 @@ class Selen:
         # print("Filtering by text:", text)
         # return an instance of the same class
         return self
+
+    def display(self, elem=None):
+        elem = self.elem if elem is None else elem
+        if self.WD.execute_script("arguments[0].style.display = 'block';", elem):
+            print("Element already VISIBLE, xpath:", self.xpath(elem))
+        else:
+            self.print("Element VISIBILITY switched ON, xpath:", self.xpath(elem))
+        return self
+
+    def Get_images(self, extract=False, check=False):
+        self.elems = self.elem = self.WD
+        self.get_images(extract=extract, check=check)
+        return self.images if extract else self
+
+    def get_images(self, extract=False, check=False):
+        self.tag('img')
+        self.stat = {}
+        self.print("Found images:", len(self.elems))
+        for image in self.elems:
+            xpath = self.xpath(image)
+            self.images.append(xpath)
+            src = image.get_attribute("src")
+            alt = image.get_attribute("alt")
+            visible = image.is_displayed()
+            self.stat[xpath] = {'source': src, 'alt': alt, 'visible': visible }
+            self.print(f"Image: xpath: {xpath}, source: {src}, alt = {alt}, visible: {visible}")
+            # self.WD.execute_script("arguments[0].style.display = 'block';", image)
+            if not check:
+                continue
+            ok = True
+            if not src:
+                ok = False
+                print(f"!!! Image without source, xpath: {xpath}")
+            if not visible:
+                ok = False
+                print(f"!!! Invisible Image, xpath: {xpath}")
+            if not alt:
+                ok = False
+                print(f"!!! Image without ALT attribute, xpath: {xpath}")
+            # checked if loaded
+            complete = self.WD.execute_script("return arguments[0].complete", image)
+            n_width = self.WD.execute_script("return arguments[0].naturalWidth > 0", image)
+            if not complete or not n_width:
+                ok = False
+                print(f"!!! Image not loaded, xpath:{xpath}. Arguments: Complete={complete}, naturalWidth={n_width}")
+                self.stat[xpath]['loaded'] = False
+            else:
+                self.stat[xpath]['loaded'] = True
+            if ok:
+                print("Checked  ... OK")
+        self.print("Got images:", len(self.images))
+        return self.images if extract else self
 
     def save_cookies_to_file(self, file_name):
         if self.wd_name in COOKIES:
