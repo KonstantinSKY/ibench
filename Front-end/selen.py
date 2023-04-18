@@ -6,17 +6,21 @@ import asyncio
 import requests
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.edge.service import Service as EdgeService
-from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.chrome import service as OperaService
+
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from webdriver_manager.opera import OperaDriverManager
 
 from security import COOKIES
 from collections import Counter
@@ -60,7 +64,12 @@ class Selen:
             self.WD = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=opts)
 
         elif wd == "Opera":
-            pass
+            opts = webdriver.ChromeOptions()
+            opts.add_experimental_option('w3c', True)
+            # opts.binary_location = "path/to/opera.exe"
+            webdriver_service = OperaService.Service(OperaDriverManager().install())
+            webdriver_service.start()
+            self.WD = webdriver.Remote(webdriver_service.service_url, options=opts)
 
         else:
             print('!!! WebDriver for: ', wd, " does NOT Exits in the system.")
@@ -452,7 +461,7 @@ class Selen:
             src = image.get_attribute("src")
             alt = image.get_attribute("alt")
             visible = image.is_displayed()
-            self.stat[xpath] = {'source': src, 'alt': alt, 'visible': visible }
+            self.stat[xpath] = {'source': src, 'alt': alt, 'visible': visible}
             self.print(f"Image: xpath: {xpath}, source: {src}, alt = {alt}, visible: {visible}")
             # self.WD.execute_script("arguments[0].style.display = 'block';", image)
             if not check:
