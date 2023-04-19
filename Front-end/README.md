@@ -210,6 +210,32 @@ Almost all methods and actions on them can be assembled logical chains of code
 
 At the end of the code chain in one line, actions on the last found elements can be continued in a new line, because these elements are stored in the variables: `se.elen` and `se.elems` 
 ```pyhton
-se.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', "email@gmail.com").parent(2).tag("span").attr('class', 'validation_status_ok')
+email="email@gmail.com"
+se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email).parent(2).tag("span").attr('class', 'validation_status_ok')
+
 ```
+The same code results:
+```pyhton
+email = "email@email.com"
+se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email")
+se.parent(2).tag("span").attr('class', 'validation_status_ok')
+#or
+se.Find(NAME, "email")
+se.type(email).
+se.sleep(0.2, 1)
+se.attr('value', email)
+se.parent(2)
+se.tag("span")
+se.attr('class', 'validation_status_ok')
+```
+It do next steps:
+- found WebElement by attribute Name="email"
+- type email text to the WebElement
+- random delay from 0.2 to 1 seconds
+- check for new WebElement attribute 'value'= email
+- found new parrent element to 2 levels up
+- found element by Tag cpan
+- check attribute 'class' = 'validation_status_ok'
+
+
 ## 
