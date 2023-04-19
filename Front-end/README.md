@@ -196,5 +196,7 @@ one_element = se.Find(XPATH, '//button[text()="Some text"]').elem
 # many_elements is list (array) of instances of WebElement
 many_elements = se.Find(XPATH, '//button').elems
 ```
-
-
+`Find` and `Wait` methods find like and other similar methods return `one` element and `many` elements at the same time and stores them in internal variables: `se.elem` and `se.elems`
+They will be available by these names and it will also be possible to perform some actions with them until another method(s) saves new data there
+All  searching methods always find a array of WEB elements and gets a single WEBelement as the first element of the array
+`se.elem == se.elems[0]`
