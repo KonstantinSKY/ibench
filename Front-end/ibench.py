@@ -65,7 +65,7 @@ class iBench(Selen):
         self.Wait(self.l_h2).text("Log in")
         self.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
 
-        # self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span").attr('class', 'validation_status_ok')
+        self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span").attr('class', 'validation_status_ok')
         self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span")
         self.attr('class', 'validation_status_ok')
 
