@@ -126,6 +126,7 @@ se.Find((Tag, "a"), xpath_locators, locators)
 
 ## Method `Wait` - finding and waiting for the appearance of an element on the page and not only
 The method `Wait` can take the same parameters as the `Find` method, but it will only expect the first element in the chain and the rest of the elements in the chain will be found in the same way as the find method does.
+- No exception handling is required, the logic is already inside the White method
 It was like:
 ```pyhton
 from selenium.webdriver.support import expected_conditions as EC
@@ -172,7 +173,6 @@ se.Wait(locators)
 
 #or Combined addition of locators  
 se.Wait(locators, xpath_locator, (TAG, "a"))
-se.Wait((Tag, "a"), xpath_locators, locators)
+se.Wait((TAG, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
-* **No exception handling is required, the logic is already inside the `Wait` method
