@@ -83,16 +83,19 @@ driver.find_element(By.XPATH, "//xpath string...").find_element(By.CLASS_NAME, L
 #or with locator variables
 xpath_locator = ("xpath", "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
 class_locator = ("class_name", "Login_submit_wrapper__2-PYe"")
+tag_locator = ("tag name", "input")
 
-driver.find_element(*xpath_locator).find_element(*class_locator)
+driver.find_element(*xpath_locator).find_element(*class_locator).find_element(*tag_locator)
 ```
 Now with Selen:
 ```python
-se.Find(XPATH, "//xpath string...").find(By.CLASS, Login_submit_wrapper__2-PYe"")
+se.Find(XPATH, "//xpath string...").find(By.CLASS, "Login_submit_wrapper__2-PYe)
 
 #or with locator variables
 xpath_locator = (XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
-class_locator = (CLASS, "Login_submit_wrapper__2-PYe"")
+class_locator = (CLASS, "Login_submit_wrapper__2-PYe)
+tag_locator = ("tag name", "input")
 
-se.Find(xpath_locator).find(class_locator)
+se.Find(xpath_locator).find(class_locator).find(tag_locator)
 ```
+
