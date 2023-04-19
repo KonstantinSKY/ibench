@@ -12,9 +12,9 @@ this is a mini framework or an add-on for the selenium and unitest frameworks
 
 # Quick stars and understanding
 
-##So, what can Selen do:
+## So, what can Selen do:
 
-###New find method and simplified adding locators as method arguments
+### New find method and simplified adding locators as method arguments
 
 it was like this:
 ```python
