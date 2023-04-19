@@ -138,7 +138,7 @@ try:
 except:
     driver.quit()
 ```
-Now with Selen: examples:
+Now with Selen:
 ```python
 from selen import *
 
@@ -177,3 +177,24 @@ se.Wait(locators, xpath_locator, (TAG, "a"))
 se.Wait((TAG, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
+
+## Assigning an element or elements to a variable 
+The ways of assigning elements to variables in Selen and Selenium are different
+Selenium Example:
+```python
+# one_element is instance of WebElement
+one_element = driver.find_element(By.XPATH, '//button[text()="Some text"]')
+
+# many_elements is list (array) of instances of WebElement
+many_elements = driver.find_elements(By.XPATH, '//button')
+```
+Selen Example:
+```python
+# one_element is instance of WebElement
+one_element = se.Find(XPATH, '//button[text()="Some text"]').elem
+
+# many_elements is list (array) of instances of WebElement
+many_elements = se.Find(XPATH, '//button').elems
+```
+
+
