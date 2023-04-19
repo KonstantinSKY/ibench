@@ -180,6 +180,7 @@ se.Wait((TAG, "a"), xpath_locators, locators)
 
 ## Assigning an element or elements to a variable 
 The ways of assigning elements to variables in Selen and Selenium are different
+
 Selenium Example:
 ```python
 # one_element is instance of WebElement
@@ -203,3 +204,12 @@ They will be available by these names and it will also be possible to perform so
 All  searching methods always find a array of WEB elements and gets a single WEBelement as the first element of the array
 
 `se.elem == se.elems[0]`
+
+## Chains of Selen methods and actions with them
+Almost all methods and actions on them can be assembled logical chains of code
+
+At the end of the code chain in one line, actions on the last found elements can be continued in a new line, because these elements are stored in the variables: `se.elen` and `se.elems` 
+```pyhton
+se.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', "email@gmail.com").parent(2).tag("span").attr('class', 'validation_status_ok')
+```
+## 
