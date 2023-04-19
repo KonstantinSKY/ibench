@@ -54,7 +54,7 @@ class iBench(Selen):
 
     def login(self):
         lc_fields = ((CLASS, "Login_form__2mvFD"), (TAG, "input"))
-        lc_submit_button = ((CLASS, "Login_submit_wrapper__2-PYe"), (TAG, "button"))
+        lc_submit_button = ((CLASS,"Login_submit_wrapper__2-PYe"), (TAG, "button"))
         lc_validation = ((CLASS, "Login_form__2mvFD"), (CLASS, "form_group"))
         l_valid = (CLASS, "FrontPage_registrationLinks__2DkiO")
 
