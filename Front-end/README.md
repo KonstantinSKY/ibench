@@ -156,7 +156,7 @@ tag_locator = (TAG, "input")
 se.Wait(xpath_locator).find(class_locator).find(tag_locator)
 
 # all locator as tuples inside one method 
-se.Wait((ID, "myDynamicElement),(By.CLASS, "Login_submit_wrapper__2-PYe))
+se.Wait((ID, "myDynamicElement),(CLASS, "Login_submit_wrapper__2-PYe))
 
 #or with locator variables
 xpath_locator = (ID, "myDynamicElement")
