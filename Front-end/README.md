@@ -30,6 +30,15 @@ driver.find_element(By.CSS_SELECTOR, "css selector")
 
 ```
 Now is:
-
+``` pyhton
+se.Find(ID, "id")
+se.Find(NAME, "name")
+se.Find(XPATH, "xpath")
+se.Find(LINK, "link text")
+se.Find(PART_LINK, "partial link text")
+se.Find(TAG, "tag name")
+se.Find(CLASS, "class name")
+se.Find(CSS, "css selector")
+```
 
 
