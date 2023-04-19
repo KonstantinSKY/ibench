@@ -73,5 +73,5 @@ se.Find_element(class_locator)
 ```
 
 ### Find and find is different method
-Methods `Find` with Capitalise name used if it calls first after the WebDriver (for All WEB page elements) and the lowercase method `find` is used when calling after another already found element.
+Methods `Find` with Capital first letter used if it calls first after the WebDriver (for All WEB page elements) and the lowercase method `find` is used when calling after another already found element.
 There are several more methods that work in the same principle. But more on that later.
