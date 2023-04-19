@@ -228,14 +228,14 @@ se.parent(2)
 se.tag("span")
 se.attr('class', 'validation_status_ok')
 ```
-It do next steps:
-- found WebElement by attribute Name="email"
-- type email text to the WebElement
+This code does next steps:
+- found WebElement by attribute `NAME="email"`
+- type `email` text to the WebElement
 - random delay from 0.2 to 1 seconds
-- check for new WebElement attribute 'value'= email
+- check for new WebElement attribute `'value'= email`
 - found new parrent element to 2 levels up
-- found element by Tag cpan
-- check attribute 'class' = 'validation_status_ok'
+- found element by Tag `span`
+- check attribute `'class' = 'validation_status_ok'`
 
 
 ## 
