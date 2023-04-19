@@ -209,13 +209,13 @@ All  searching methods always find a array of WEB elements and gets a single WEB
 Almost all methods and actions on them can be assembled logical chains of code
 
 At the end of the code chain in one line, actions on the last found elements can be continued in a new line, because these elements are stored in the variables: `se.elen` and `se.elems` 
-```pyhton
+```python
 email="email@gmail.com"
 se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email).parent(2).tag("span").attr('class', 'validation_status_ok')
 
 ```
 The same code results:
-```pyhton
+```python
 email = "email@email.com"
 se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email")
 se.parent(2).tag("span").attr('class', 'validation_status_ok')
