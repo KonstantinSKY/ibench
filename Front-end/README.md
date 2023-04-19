@@ -42,7 +42,7 @@ se.Find(CSS, "css selector")
 ```
 ******* `se` it is short from `self`
 
-### simplified adding locators to methods by several variants
+### Simplified adding locators to methods by several variants
 It Was like:
 ```python
 driver.find_element(By.XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
@@ -75,3 +75,24 @@ se.Find_element(class_locator)
 ### `Find` and `find` are differents method
 Methods `Find` with Capital first letter used if it calls first after the WebDriver (for All WEB page elements) and the lowercase method `find` is used when calling after another already found element.
 There are several more methods that work in the same principle. But more on that later.
+
+It Was like:
+```python
+driver.find_element(By.XPATH, "//xpath string...").find_element(By.CLASS_NAME, Login_submit_wrapper__2-PYe)
+
+#or with locator variables
+xpath_locator = ("xpath", "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+class_locator = ("class_name", "Login_submit_wrapper__2-PYe"")
+
+driver.find_element(*xpath_locator).find_element(*class_locator)
+```
+Now with Selen:
+```python
+se.Find(XPATH, "//xpath string...").find(By.CLASS, Login_submit_wrapper__2-PYe"")
+
+#or with locator variables
+xpath_locator = (XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+class_locator = (CLASS, "Login_submit_wrapper__2-PYe"")
+
+se.Find(xpath_locator).find(class_locator)
+```
