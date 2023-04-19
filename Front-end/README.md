@@ -138,13 +138,14 @@ try:
 except:
     driver.quit()
 ```
-Now with Selen examples:
+Now with Selen: examples:
 ```python
-
 from selen import *
 
 se.Wait(ID, "myDynamicElement")
-
+```
+And more examples:
+```python
 se.Wait(ID, "myDynamicElement").find(CLASS, "Login_submit_wrapper__2-PYe)
 
 #or with locator variables
@@ -155,17 +156,17 @@ tag_locator = (TAG, "input")
 se.Wait(xpath_locator).find(class_locator).find(tag_locator)
 
 # all locator as tuples inside one method 
-se.Wait((XPATH, "//xpath string..."),(By.CLASS, "Login_submit_wrapper__2-PYe))
+se.Wait((ID, "myDynamicElement),(By.CLASS, "Login_submit_wrapper__2-PYe))
 
 #or with locator variables
-xpath_locator = (XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+xpath_locator = (ID, "myDynamicElement")
 class_locator = (CLASS, "Login_submit_wrapper__2-PYe)
 tag_locator = (TAG, "input")
 
 se.Wait(xpath_locator, class_locator, tag_locator)
 
 #or All locators in one variable : Tuple of tuples
-locators = ((XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]"),
+locators = ((ID, "myDynamicElement"),
             (CLASS, "Login_submit_wrapper__2-PYe),
             (TAG, "input"))
 
