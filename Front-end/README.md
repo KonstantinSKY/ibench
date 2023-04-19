@@ -16,7 +16,7 @@ this is a mini framework or an add-on for the selenium and unitest frameworks
 
 ### New find method and simplified adding locators as method arguments
 
-it was like this:
+It was like this:
 ```python
 
 driver.find_element(By.ID, "id")
@@ -41,4 +41,33 @@ se.Find(CLASS, "class name")
 se.Find(CSS, "css selector")
 ```
 
+### simplified adding locators to methods by several variants
+It Was like:
+```python
+driver.find_element(By.XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+driver.find_element(By.CLASS_NAME, ""Login_submit_wrapper__2-PYe"")
 
+#or
+driver.find_element("xpath", "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+driver.find_element("class name", ""Login_submit_wrapper__2-PYe"")
+
+#or with locator variables
+xpath_locator = ("xpath", "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+class_locator = ("class_name", "Login_submit_wrapper__2-PYe"")
+
+driver.find_element(*xpath_locator)
+driver.find_element(class_locator[0], class_locator[1])
+```
+With Selen is:
+```python
+se.Find(XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+se.Find(CLASS_NAME, ""Login_submit_wrapper__2-PYe"")
+
+
+#or with locator variables
+xpath_locator = ("xpath", "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+class_locator = ("class_name", "Login_submit_wrapper__2-PYe"")
+
+driver.find_element(xpath_locator)
+driver.find_element(class_locator)
+```
