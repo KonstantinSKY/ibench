@@ -1,13 +1,23 @@
-from selen import Selen
-from selen import TAG, CLASS, XPATH, NAME
+# Import class Selen and simple Locator names and variables
+from selen import *
+
+
 from time import sleep
+# file
 from security import EMAIL, PASSW
 
 
+# Class of project
 class iBench(Selen):
+
+    def __init__(se, wd="Chrome"):
+        super().__init__(wd)
+        # Web-site and tests environment settings
+        se.url = "https://ibench.net/"
+        se.ok_assertions = False
+        se.ok_print = True
+
     # locators
-    l_h1 = (TAG, "h1")
-    l_h2 = (TAG, "h2")
     l_login_btn = (CLASS, "Navigation_login__JL_4K")
     l_login_fields = ((CLASS, "Login_form__2mvFD"), (TAG, "input"))
 
@@ -16,25 +26,24 @@ class iBench(Selen):
     l_check_button = (CLASS, 'FrontPage_btnWrapper__2Q75S')
     l_btn = (TAG, "a")
 
-    def __init__(self, wd="Chrome"):
-        super().__init__(wd)
-        # Web-site and tests environment settings
-        self.url = "https://ibench.net/"
-        self.ok_assertions = False
-        self.ok_print = True
+    def main_page(se):
+        se.WD.get(se.url)  # Get page from WD
+        # New Wait method
+        print()
+        se.Wait(l_h1).text().out()
 
-    def main_page(self):
-        self.WD.get(self.url)
-        # self.Wait(self.l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
-        self.Tag('h1').text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
-        self.title("iBench - real-time developers Hiring")
-        self.curr_url("https://ibench.net/")
+
+        se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
+
+        se.Tag('h1').text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
+        se.title("iBench - real-time developers Hiring")
+        se.curr_url("https://ibench.net/")
         # print(self.Get_links(check=False, asynchron=True).stat)
         # print(self.Get_images(check=True, extract=True))
         # sleep(10)
 
         # self.check_links_a()
-        self.sleep(5)
+        se.sleep(5)
 
         # self.check_text("Looking for a developers, UX/UI designer, QA or DevOps...or development agency?", self.l_h1)
         # print(self.Tag("a").text1("Log in").elem)
@@ -64,7 +73,8 @@ class iBench(Selen):
 
         # print(self.elem.get_property('attributes')[0])
         print(self.Find(NAME, "email").all_attrs())
-        print("CDC", self.Tag("form").count().tag("input").count().contains({'label': 'email', 'value': 'sky012877@gmail.com'}).elems)
+        print("CDC", self.Tag("form").count().tag("input").count().contains(
+            {'label': 'email', 'value': 'sky012877@gmail.com'}).elems)
 
         # self.Find(NAME, "email").parent(2).find(TAG, 'span').attr('class', 'validation_status_ok')
         # validations = self.finds(*lc_validation)
@@ -96,10 +106,9 @@ class iBench(Selen):
     def recovery_password(self):
         pass
 
-    def main(self):
-        self.WD.close()
+    def main(se):
 
 
 if __name__ == "__main__":
-    iBench().login()
+    iBench().main()
     sleep(10)
