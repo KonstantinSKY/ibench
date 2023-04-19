@@ -118,6 +118,61 @@ locators = ((XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div
 
 se.Find(locators)
 
-#or Combined addition of locators 
+#or Combined addition of locators  
 se.Find(locators, xpath_locator, (TAG, "a"))
+se.Find((Tag, "a"), xpath_locators, locators)
+# ! Any combinations as You wish
 ```
+
+## Method `Wait` - finding and waiting for the appearance of an element on the page and not only
+The method `Wait` can take the same parameters as the `Find` method, but it will only expect the first element in the chain and the rest of the elements in the chain will be found in the same way as the find method does.
+It was like:
+```pyhton
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+try:
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "myDynamicElement"))
+    )
+except:
+    driver.quit()
+```
+Now with Selen examples:
+```python
+
+from selen import *
+
+se.Wait(ID, "myDynamicElement")
+
+se.Wait(ID, "myDynamicElement").find(CLASS, "Login_submit_wrapper__2-PYe)
+
+#or with locator variables
+id_locator = (ID, "MyDynamicElement")
+class_locator = (CLASS, "Login_submit_wrapper__2-PYe)
+tag_locator = (TAG, "input")
+
+se.Wait(xpath_locator).find(class_locator).find(tag_locator)
+
+# all locator as tuples inside one method 
+se.Wait((XPATH, "//xpath string..."),(By.CLASS, "Login_submit_wrapper__2-PYe))
+
+#or with locator variables
+xpath_locator = (XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+class_locator = (CLASS, "Login_submit_wrapper__2-PYe)
+tag_locator = (TAG, "input")
+
+se.Wait(xpath_locator, class_locator, tag_locator)
+
+#or All locators in one variable : Tuple of tuples
+locators = ((XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]"),
+            (CLASS, "Login_submit_wrapper__2-PYe),
+            (TAG, "input"))
+
+se.Wait(locators)
+
+#or Combined addition of locators  
+se.Wait(locators, xpath_locator, (TAG, "a"))
+se.Wait((Tag, "a"), xpath_locators, locators)
+# ! Any combinations as You wish
+```
+* **No exception handling is required, the logic is already inside the `Wait` method
