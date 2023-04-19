@@ -89,13 +89,35 @@ driver.find_element(*xpath_locator).find_element(*class_locator).find_element(*t
 ```
 Now with Selen:
 ```python
-se.Find(XPATH, "//xpath string...").find(By.CLASS, "Login_submit_wrapper__2-PYe)
+se.Find(XPATH, "//xpath string...").find(CLASS, "Login_submit_wrapper__2-PYe)
 
 #or with locator variables
 xpath_locator = (XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
 class_locator = (CLASS, "Login_submit_wrapper__2-PYe)
-tag_locator = ("tag name", "input")
+tag_locator = (TAG, "input")
 
 se.Find(xpath_locator).find(class_locator).find(tag_locator)
 ```
+## Even shorter code in method chains to find elements
+Several ways to search for elements by a chain of locators, all locators in one `Find` method  
+```python
+# all locator as tuples inside one method 
+se.Find((XPATH, "//xpath string..."),(By.CLASS, "Login_submit_wrapper__2-PYe))
 
+#or with locator variables
+xpath_locator = (XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+class_locator = (CLASS, "Login_submit_wrapper__2-PYe)
+tag_locator = (TAG, "input")
+
+se.Find(xpath_locator, class_locator, tag_locator)
+
+#or All locators in one variable : Tuple of tuples
+locators = ((XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]"),
+            (CLASS, "Login_submit_wrapper__2-PYe),
+            (TAG, "input"))
+
+se.Find(locators)
+
+#or Combined addition of locators 
+se.Find(locators, xpath_locator, (TAG, "a"))
+```
