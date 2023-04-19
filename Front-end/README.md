@@ -40,6 +40,7 @@ se.Find(TAG, "tag name")
 se.Find(CLASS, "class name")
 se.Find(CSS, "css selector")
 ```
+******* Selen project is created as python class so `se` it is short from `self`
 
 ### simplified adding locators to methods by several variants
 It Was like:
@@ -61,13 +62,12 @@ driver.find_element(class_locator[0], class_locator[1])
 With Selen is:
 ```python
 se.Find(XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
-se.Find(CLASS_NAME, ""Login_submit_wrapper__2-PYe"")
-
+se.Find(CLASS, ""Login_submit_wrapper__2-PYe"")
 
 #or with locator variables
 xpath_locator = ("xpath", "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
 class_locator = ("class_name", "Login_submit_wrapper__2-PYe"")
 
-driver.find_element(xpath_locator)
-driver.find_element(class_locator)
+se.Find_element(xpath_locator)
+se.Find_element(class_locator)
 ```
