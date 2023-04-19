@@ -15,7 +15,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.chrome import service as OperaService
+from selenium.webdriver.chrome.service import Service as OperaService
 
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
@@ -65,11 +65,9 @@ class Selen:
 
         elif wd == "Opera":
             opts = webdriver.ChromeOptions()
+            # opts.binary_location = "/usr/bin/opera"
             opts.add_experimental_option('w3c', True)
-            # opts.binary_location = "path/to/opera.exe"
-            webdriver_service = OperaService.Service(OperaDriverManager().install())
-            webdriver_service.start()
-            self.WD = webdriver.Remote(webdriver_service.service_url, options=opts)
+            self.WD = webdriver.Chrome(service=OperaService(OperaDriverManager().install()), options=opts)
 
         else:
             print('!!! WebDriver for: ', wd, " does NOT Exits in the system.")
@@ -81,13 +79,14 @@ class Selen:
         self.images = []
         self.wd_name = wd
         self.WD.maximize_window()
-        self.WD.act_chain = ActionChains(self)
+        self.AC = ActionChains(self.WD)
         self.WDW = WebDriverWait(self.WD, 10)
         self.url = ""
-        self.assert_ok = True
-        self.print_ok = True
+        self.ok_assert = True
+        self.ok_print = True
         self.stat = {}
 
+    # Service function Fill elems variables (self.elem, self.elems after operation with WebDriver
     def __fill_elems(self, data):
         if isinstance(data, list):
             self.elems = data
@@ -96,15 +95,31 @@ class Selen:
             self.elem = data
             self.elems = [self.elem]
 
-    def add_cookies(self):
-        for cookie in COOKIES[self.wd_name]:
-            self.WD.execute_cdp_cmd('Network.setCookie', cookie)
-            # self.WD.add_cookie(cookie)
+    # Service get depth od tuples in tuples
+    def __get_tuple_depth(self, t):
+        if isinstance(t, tuple):
+            return 1 + max(self.__get_tuple_depth(i) for i in t)
+        else:
+            return 0
 
+    # Service method to normalize any arguments to tuple of tuples standard
+    def __args_normalizer(self, *args):
+        for i in range(self.__get_tuple_depth(args) - 2):
+            args = sum(args, ())
+        return args
+
+    # Print text to STDOUT if it set
     def print(self, *args, **kwargs):
-        if self.print_ok:
+        if self.ok_print:
             print(*args, **kwargs)
 
+    # Run assertion if it set
+    def assertion(self, message=''):
+        print("!!!", message)
+        if self.ok_assert:
+            assert False, message
+
+    # Delay chain function. Possible to set random delay between two parameters.
     def sleep(self, seconds, finish=None):
         if finish is None:
             self.print("Sleeping for:", seconds, "seconds")
@@ -116,16 +131,8 @@ class Selen:
         time.sleep(uniform(seconds, finish))
         return self
 
-    def assertion(self, message=''):
-        print("!!!", message)
-        if self.assert_ok:
-            assert False, message
-
-    def click(self):
-        self.elem.click()
-        self.print("Clicked element:", self.elem)
-        return self
-
+    # --------   Functions of findins, selecting elements -----------
+    # The Wait chain function finds and waits for appear element and save elems variables
     def Wait(self, *args):
         args = self.__args_normalizer(args)
         # self.print("Waiting and Looking for :", args)
@@ -144,14 +151,23 @@ class Selen:
 
         if args[1:]:
             self.find(*args[1:])
-
         return self
 
+    # Find element(s) by arguments for all page elements and from WebDriver directly
     def Find(self, *args):
         self.elems = self.elem = self.WD
         self.find(*args)
         return self
 
+    # Find element(s) inside other element self.elem by arguments
+    def find(self, *args):
+        args = self.__args_normalizer(args)
+        for by in args:
+            self.__find_one(*by)
+
+        return self
+
+    # Service function for the element finding
     def __find_one(self, *args: tuple):
         if not self.elem:
             self.assertion(f"Previous element = {self.elem}. Cant to find next {args} element")
@@ -173,70 +189,68 @@ class Selen:
         self.elems = elems
         if self.elems:
             self.elem = self.elems[0]
-            # print("elems:", self.elems)
-            # print("elem", self.elem)
             return
 
         self.elem = None
         self.assertion(f"Element(s) not found: {args}, elems: {self.elems}, elem: {self.elem}")
         return
 
-    def __get_tuple_depth(self, t):
-        if isinstance(t, tuple):
-            return 1 + max(self.__get_tuple_depth(i) for i in t)
-        else:
-            return 0
-
-    def __args_normalizer(self, *args):
-        for i in range(self.__get_tuple_depth(args) - 2):
-            args = sum(args, ())
-        return args
-
-    def find(self, *args):
-        args = self.__args_normalizer(args)
-        for by in args:
-            self.__find_one(*by)
-
+    # Find element by tag name,  chain function for all page elements and from WebDriver directly
+    def Tag(self, tag_name: str):
+        self.elems = self.elem = self.WD
+        self.tag(tag_name)
         return self
 
-    def __checker(self, got, expect, message='') -> bool:
+    # Find element by tag name inside other elements in self.elems
+    def tag(self, tag_name: str, extract=False):
 
-        if got == expect:
-            self.print("Checked:", message, "... OK")
-            return True
+        elems = self.elem.find_elements(By.TAG_NAME, tag_name)
+        if not elems:
+            message = f"Elements not found by TAG NAME: {tag_name}"
+            print("!!!", message)
+            self.assertion(message)
+            elems = []
+        self.__fill_elems(elems)
+        return self.elems if extract else self
 
-        self.assertion(f"!!! Wrong {message}")
-        print("Got:", got)
-        print("Expected:", expect)
-        return False
+    # Selecting Element filter by contain data(text and attributes) from all elements on Page from WD
+    def Contains(self, data=None):
+        self.__fill_elems(self.WD.find_elements(XPATH, "//*"))
+        self.print("Count", len(self.elems))
 
-    def is_title(self, title: str) -> bool:
-        return title == self.WD.title
-
-    def title(self, title=''):
-        if title:
-            self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
+        if data is None:
             return self
-        return self.WD.title
 
-    def is_curr_url(self, url):
-        return url == self.WD.current_url
+        self.contains(data)
 
-    def curr_url(self, url=''):
-        if url:
-            self.__checker(self.WD.current_url, url, "Current_URL ")
-            return self
-        return self.WD.current_url
+    # Selecting Element filter by contain data(text and attributes) from other element self.elem
+    def contains(self, data):
+        elems = []
+        if isinstance(data, dict):
+            for self.elem in self.elems:
+                result = False
+                print("elem", self.elem)
+                for attr, value in data.items():
+                    if not self.is_attr(attr, value):
+                        result = False
+                        print("attr", attr, "not found")
+                        break
+                    result = True
+                    print("attr:", attr, value, "found")
+                if not result:
+                    continue
+                elems.append(self.elem)
 
-    def is_text(self, text):
-        return text == self.elem.text
+        if isinstance(data, str):
+            for elem in self.elems:
+                if elem.text != data:
+                    continue
+                elems.append(elem)
 
-    def text(self, text=None):
-        if text is None:
-            return self.elem.text
-        self.__checker(self.elem.text, text, f"Text at elements: {self.elem}")
+        self.__fill_elems(elems)
         return self
 
+    # Select parent element of self.elem, can use number of parent level, default = 1
     def parent(self, levels=1):
         for i in range(levels):
             try:
@@ -245,40 +259,86 @@ class Selen:
                 self.assertion(f"Parent Element at level {i} not found")
         return self
 
-    def type(self, text=None):
+    # -------------- Functions for actions with found element(s) ----------------
+    # Click chain function have 2 modes simple and with action chains with pause.
+    def click(self, action=False, pause=0):
+        if action:
+            self.__action_click(pause=pause)
+        else:
+            self.elem.click()
+        self.print("Clicked element:", self.elem)
+        return self
+
+    # Context Click chain function with pause.
+    def context_click(self, pause=0):
+        self.__action_click(mode='context', pause=pause)
+        self.print("Context Clicked element:", self.elem)
+        return self
+
+    # Double Click with action chains and pause.
+    def double_click(self, pause=0):
+        self.__action_click(mode='double', pause=pause)
+        self.print("Double Clicked element:", self.elem)
+        return self
+
+    # Service functions for any clicks
+    def __action_click(self, mode='', pause=0):
+        self.AC.move_to_element(self.elem)
+        if pause > 0:
+            self.print("Pause before click, seconds:", pause)
+            self.AC.pause(pause)
+        under = '_' if mode else ''
+        eval(f"self.action.{mode}{under}click()")
+        self.AC.perform()
+
+    # Display hidden and invisible element
+    def display(self, elem=None):
+        elem = self.elem if elem is None else elem
+
+        if elem.is_displayed():
+            self.print("Element VISIBILITY already is ON, xpath:", self.xpath(elem))
+        else:
+            self.WD.execute_script("arguments[0].style.display = 'block';", elem)
+            print("Element VISIBILITY switched ON, xpath:", self.xpath(elem))
+        return self
+
+    # Text of element (self.elem) It has 2 mode text return or check if the text presents
+    def title(self, title=''):
+        if title:
+            self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
+            return self
+        return self.WD.title
+
+    def curr_url(self, url=''):
+        if url:
+            self.__checker(self.WD.current_url, url, "Current_URL ")
+            return self
+        return self.WD.current_url
+
+    # Text of element (self.elem) It has 2 mode text return or check if the text presents
+    def text(self, text=None):
+        if text is None:
+            return self.elem.text
+        self.__checker(self.elem.text, text, f"Text at element: {self.elem}")
+        return self
+
+    # Type text in the element (self.elem)
+    def type(self, text):
         self.elem.click()
         self.elem.clear()
         self.elem.send_keys(text)
         return self
 
-    def is_attr(self, attr, value):
-        return value == self.elem.get_attribute(attr)
-
-    def attr(self, attr, value=None):
-        real_value = self.elem.get_attribute(attr)
-
-        if real_value is None:
-            print("!!! Attribute :", attr, "NOT found")
-            self.assertion('Attribute not found')
-            return self
-
-        if value is None:
-            return real_value
-
-        self.__checker(real_value, value, f"Attribute: {attr} with value: {value} for elements: {self.elem}")
+    # Print count of selected elements of check if the count of element == asked counts and returns
+    def count(self, num=None):
+        count = len(self.elems)
+        if num is None:
+            self.print("Count of Elements:", count)
+            return count
+        self.__checker(count, num, f"Count of  elements: {self.elem}")
         return self
 
-    def all_attrs(self, elem=None) -> dict:
-        elem = self.elem if elem is None else elem
-        attrs = self.WD.execute_script("""
-            var items = {}; 
-            for (index = 0; index < arguments[0].attributes.length; ++index) { 
-                items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value 
-            }; 
-            return items;
-            """, elem)
-        return attrs
-
+    # Return absolute xpath of Element or None if not found
     def xpath(self, elem=None) -> str or None:
         elem = self.elem if elem is None else elem
         xpath = self.WD.execute_script("""
@@ -309,32 +369,65 @@ class Selen:
             self.assertion(f"!!! Found Incorrect abs XPATH, Got {xpath} but Can not to find Element by it")
             return None
 
-    def Tag(self, tag_name: str):
-        self.elems = self.elem = self.WD
-        self.tag(tag_name)
+    # Check attribute of self.elem, if exists,  for value, if value is None returns value
+    def attr(self, attr, value=None):
+        real_value = self.elem.get_attribute(attr)
+
+        if real_value is None:
+            print("!!! Attribute :", attr, "NOT found")
+            self.assertion('Attribute not found')
+            return self
+
+        if value is None:
+            return real_value
+
+        self.__checker(real_value, value, f"Attribute: {attr} with value: {value} for elements: {self.elem}")
         return self
 
-    def tag(self, tag_name: str, extract=False):
+    # return all attributes of element
+    def all_attrs(self, elem=None) -> dict:
+        elem = self.elem if elem is None else elem
+        attrs = self.WD.execute_script("""
+             var items = {}; 
+             for (index = 0; index < arguments[0].attributes.length; ++index) { 
+                 items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value 
+             }; 
+             return items;
+             """, elem)
+        return attrs
 
-        elems = self.elem.find_elements(By.TAG_NAME, tag_name)
-        if not elems:
-            message = f"Elements not found by TAG NAME: {tag_name}"
-            print("!!!", message)
-            self.assertion(message)
-            elems = []
-        self.__fill_elems(elems)
-        return self.elems if extract else self
+    # -------------- Functions for check any data with found element(s) ----------------
+    # Service method for compare two parameter and retur
+    def __checker(self, got, expect, message='') -> bool:
+        if got == expect:
+            self.print("Checked:", message, "... OK")
+            return True
 
-    def count(self):
-        self.print("Count of Elements:", len(self.elems))
-        return self
+        self.assertion(f"!!! Wrong {message}")
+        print("Got:", got)
+        print("Expected:", expect)
+        return False
 
-    # Links getting
+    def is_title(self, title: str) -> bool:
+        return title == self.WD.title
+
+    def is_curr_url(self, url) -> bool:
+        return url == self.WD.current_url
+
+    def is_text(self, text) -> bool:
+        return text == self.elem.text
+
+    def is_attr(self, attr, value) -> bool:
+        return value == self.elem.get_attribute(attr)
+
+    # --------- Links methods ------------------------------
+    # Get all links from all page with WebDriver
     def Get_links(self, extract=False, check=False, asynchron=True):
         self.elems = self.elem = self.WD
         self.get_links(extract, check, asynchron=asynchron)
         return self.links if extract else self
 
+    # Get all links from self.elem  page with WebDriver
     def get_links(self, extract=False, check=False, asynchron=True):
         self.links = []
         self.tag('a')
@@ -349,6 +442,7 @@ class Selen:
             self.check_links(asynchron=asynchron)
         return self.links if extract else self
 
+    # Check links for response 200, selecting of mode sync or async
     def check_links(self, asynchron=True):
         if asynchron:
             self.print('Async link checking...')
@@ -357,7 +451,7 @@ class Selen:
             self.print('Sync links checking...')
             self.__check_links_sync()
 
-    # Links checking
+    # Links response sync checking
     def __check_links_sync(self):
         self.stat = {}
         for link in self.links:
@@ -368,6 +462,7 @@ class Selen:
                 print("Unable to reach:", link)
         self.__summary_stat()
 
+    # Links response async checking
     async def __check_links_async(self):
         async with aiohttp.ClientSession() as session:
             tasks = []
@@ -399,58 +494,14 @@ class Selen:
         else:
             print(f"Unable to reach: {url}")
 
-    # Element filter by contain data
-    def Contains(self, data=None):
-        self.__fill_elems(self.WD.find_elements(XPATH, "//*"))
-        self.print("Count", len(self.elems))
-        if data is None:
-            return self
-
-        self.contains(data)
-
-    def contains(self, data):
-        elems = []
-        if isinstance(data, dict):
-            for self.elem in self.elems:
-                result = False
-                print("elem", self.elem)
-                for attr, value in data.items():
-                    if not self.is_attr(attr, value):
-                        result = False
-                        print("attr", attr, "not found")
-                        break
-                    result = True
-                    print("attr:", attr, value, "found")
-                if not result:
-                    continue
-                elems.append(self.elem)
-
-        if isinstance(data, str):
-            for elem in self.elems:
-                if elem.text != data:
-                    continue
-                elems.append(elem)
-
-        self.__fill_elems(elems)
-
-        # print("elem:", self.elem)
-        # print("Filtering by text:", text)
-        # return an instance of the same class
-        return self
-
-    def display(self, elem=None):
-        elem = self.elem if elem is None else elem
-        if self.WD.execute_script("arguments[0].style.display = 'block';", elem):
-            print("Element already VISIBLE, xpath:", self.xpath(elem))
-        else:
-            self.print("Element VISIBILITY switched ON, xpath:", self.xpath(elem))
-        return self
-
+    # --------- Image Methods ---------------------------
+    # Get all image from all page from WebDriver object and optional checking and install
     def Get_images(self, extract=False, check=False):
         self.elems = self.elem = self.WD
         self.get_images(extract=extract, check=check)
         return self.images if extract else self
 
+    # Get all image from element self.elem and optional checking and extract
     def get_images(self, extract=False, check=False):
         self.tag('img')
         self.stat = {}
@@ -489,6 +540,12 @@ class Selen:
                 print("Checked  ... OK")
         self.print("Got images:", len(self.images))
         return self.images if extract else self
+
+    # -----------Methods for cookies  -----------------
+    def add_cookies(self):
+        for cookie in COOKIES[self.wd_name]:
+            self.WD.execute_cdp_cmd('Network.setCookie', cookie)
+            # self.WD.add_cookie(cookie)
 
     def save_cookies_to_file(self, file_name):
         if self.wd_name in COOKIES:
