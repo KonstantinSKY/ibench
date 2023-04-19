@@ -39,3 +39,16 @@ class Edge_Login(unittest.TestCase):
     def tearDown(self) -> None:
         self.cls.WD.close()
         self.cls = None
+
+
+class Opera_Login(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.cls = Cls("Opera")
+
+    def test_login(self):
+        self.cls.login()
+
+    def tearDown(self) -> None:
+        self.cls.WD.close()
+        self.cls = None
