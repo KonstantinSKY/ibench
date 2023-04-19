@@ -10,13 +10,26 @@ this is a mini framework or an add-on for the selenium and unitest frameworks
 - error reduction
 
 
-# So, what can Selen do:
+# Quick stars and understanding
 
-##simplified adding locators as method arguments
+##So, what can Selen do:
+
+###New find method and simplified adding locators as method arguments
 
 it was like this:
 ```python
 
-
+driver.find_element(By.ID, "id")
+driver.find_element(By.NAME, "name")
+driver.find_element(By.XPATH, "xpath")
+driver.find_element(By.LINK_TEXT, "link text")
+driver.find_element(By.PARTIAL_LINK_TEXT, "partial link text")
+driver.find_element(By.TAG_NAME, "tag name")
+driver.find_element(By.CLASS_NAME, "class name")
+driver.find_element(By.CSS_SELECTOR, "css selector")
 
 ```
+Now is:
+
+
+
