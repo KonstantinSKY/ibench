@@ -18,9 +18,10 @@ class iBench(Selen):
 
     def __init__(self, wd="Chrome"):
         super().__init__(wd)
+        # Web-site and tests environment settings
         self.url = "https://ibench.net/"
-        self.assertions = False
-        self.print_ok = True
+        self.ok_assertions = False
+        self.ok_print = True
 
     def main_page(self):
         self.WD.get(self.url)
@@ -28,9 +29,9 @@ class iBench(Selen):
         self.Tag('h1').text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
         self.title("iBench - real-time developers Hiring")
         self.curr_url("https://ibench.net/")
-        print(self.Get_links(check=False, asynchron=True).stat)
-        print(self.Get_images(check=True, extract=True))
-        sleep(10)
+        # print(self.Get_links(check=False, asynchron=True).stat)
+        # print(self.Get_images(check=True, extract=True))
+        # sleep(10)
 
         # self.check_links_a()
         self.sleep(5)
@@ -52,7 +53,7 @@ class iBench(Selen):
 
         self.main_page()
         # self.Find(self.l_login_btn).click()
-        self.Tag('a').contains("Log in").click()
+        self.Tag('a').contains("Log in").double_click(pause=4)
 
         self.Wait(self.l_h2).text("Log in")
         self.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
