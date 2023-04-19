@@ -35,6 +35,11 @@ NAME = "name"
 LINK = "link text"
 PART_LINK = "partial link text"
 CSS = "css selector"
+# main tag names locators
+l_h1 = (TAG, "h1")
+l_h2 = (TAG, "h2")
+l_a = (TAG, "a")
+l_input = (TAG, "input")
 
 
 class Selen:
@@ -78,6 +83,7 @@ class Selen:
         self.links = []
         self.images = []
         self.wd_name = wd
+        self.output = None
         self.WD.maximize_window()
         self.AC = ActionChains(self.WD)
         self.WDW = WebDriverWait(self.WD, 10)
@@ -85,6 +91,8 @@ class Selen:
         self.ok_assert = True
         self.ok_print = True
         self.stat = {}
+        # TODO Tag chain functions
+        # Todo Out chain function
 
     # Service function Fill elems variables (self.elem, self.elems after operation with WebDriver
     def __fill_elems(self, data):
