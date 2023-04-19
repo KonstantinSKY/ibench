@@ -102,7 +102,7 @@ se.Find(xpath_locator).find(class_locator).find(tag_locator)
 Several ways to search for elements by a chain of locators, all locators in one `Find` method  
 ```python
 # all locator as tuples inside one method 
-se.Find((XPATH, "//xpath string..."),(By.CLASS, "Login_submit_wrapper__2-PYe))
+se.Find((XPATH, "//xpath string..."),(CLASS, "Login_submit_wrapper__2-PYe))
 
 #or with locator variables
 xpath_locator = (XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
