@@ -1,7 +1,6 @@
 # Import class Selen and simple Locator names and variables
 from selen import *
 
-
 from time import sleep
 # file
 from security import EMAIL, PASSW
@@ -31,7 +30,6 @@ class iBench(Selen):
         # New Wait method
         print()
         se.Wait(l_h1).text().out()
-
 
         se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
 
@@ -107,6 +105,14 @@ class iBench(Selen):
         pass
 
     def main(se):
+        se.Find(ID, "id")
+        se.Find(NAME, "name")
+        se.Find(XPATH, "xpath")
+        se.Find(LINK, "link text")
+        se.Find(PART_LINK, "partial link text")
+        se.Find(TAG, "tag name")
+        se.Find(CLASS, "class name")
+        se.Find(CSS, "css selector")
 
 
 if __name__ == "__main__":
