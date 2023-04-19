@@ -40,7 +40,7 @@ se.Find(TAG, "tag name")
 se.Find(CLASS, "class name")
 se.Find(CSS, "css selector")
 ```
-******* Selen project is created as python class so `se` it is short from `self`
+******* `se` it is short from `self`
 
 ### simplified adding locators to methods by several variants
 It Was like:
@@ -65,9 +65,13 @@ se.Find(XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/d
 se.Find(CLASS, ""Login_submit_wrapper__2-PYe"")
 
 #or with locator variables
-xpath_locator = ("xpath", "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
-class_locator = ("class_name", "Login_submit_wrapper__2-PYe"")
+xpath_locator = (XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
+class_locator = (CLASS, "Login_submit_wrapper__2-PYe"")
 
 se.Find_element(xpath_locator)
 se.Find_element(class_locator)
 ```
+
+### Find and find is different method
+Methods `Find` with Capitalise name used if it calls first after the WebDriver (for All WEB page elements) and the lowercase method `find` is used when calling after another already found element.
+There are several more methods that work in the same principle. But more on that later.
