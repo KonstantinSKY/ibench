@@ -230,7 +230,7 @@ se.attr('class', 'validation_status_ok')
 ```
 This code does next steps:
 - found WebElement by attribute `NAME="email"`
-- type `email` text to the WebElement
+- type text from the `email` variable to the WebElement
 - random delay from 0.2 to 1 seconds
 - check for new WebElement attribute `'value'= email`
 - found new parrent element to 2 levels up
