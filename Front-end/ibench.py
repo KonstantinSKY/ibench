@@ -29,7 +29,7 @@ class iBench(Selen):
         se.WD.get(se.url)  # Get page from WD
         # New Wait method
         print()
-        se.Wait(l_h1).text().out()
+        se.Wait(l_h1).text()
 
         se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
 
@@ -62,7 +62,7 @@ class iBench(Selen):
         # self.Find(self.l_login_btn).click()
         self.Tag('a').contains("Log in").double_click(pause=4)
 
-        self.Wait(self.l_h2).text("Log in")
+        self.Wait(l_h2).text("Log in")
         self.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
 
         self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span").attr('class', 'validation_status_ok')
@@ -71,7 +71,7 @@ class iBench(Selen):
 
         # print(self.elem.get_property('attributes')[0])
         print(self.Find(NAME, "email").all_attrs())
-        print("CDC", self.Tag("form").count().tag("input").count().contains(
+        print("CDC", self.Tag("form").tag("input").contains(
             {'label': 'email', 'value': 'sky012877@gmail.com'}).elems)
 
         # self.Find(NAME, "email").parent(2).find(TAG, 'span').attr('class', 'validation_status_ok')
