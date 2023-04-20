@@ -239,6 +239,17 @@ This code does next steps:
 
 
 ## More ways to find and filter elements
-### Method `Tag`
+### Methods `Tag()` and `tag()`
 
-### Metod `Contains
+### Metods `Contains()` and `contains()`
+
+### `parents` jump to the parent element by a different number of levels
+
+## Actions on elements 
+
+### `click()`
+
+### `double_click()`
+
+### `context_click()`
+
