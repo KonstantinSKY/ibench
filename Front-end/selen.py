@@ -296,7 +296,7 @@ class Selen:
             self.print("Pause before click, seconds:", pause)
             self.AC.pause(pause)
         under = '_' if mode else ''
-        eval(f"self.action.{mode}{under}click()")
+        eval(f"self.AC.{mode}{under}click()")
         self.AC.perform()
 
     # Display hidden and invisible element
@@ -567,4 +567,3 @@ class Selen:
 
 if __name__ == '__main__':
     time.sleep(15)
-    W
