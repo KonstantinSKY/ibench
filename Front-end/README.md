@@ -178,7 +178,7 @@ se.Wait((TAG, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
 
-## Assigning an element or elements to a variable 
+## Assigning an element or elements to a variables 
 The ways of assigning elements to variables in Selen and Selenium are different
 
 Selenium Example:
@@ -238,4 +238,7 @@ This code does next steps:
 - check attribute `'class' = 'validation_status_ok'`
 
 
-## 
+## More ways to find and filter elements
+### Method `Tag`
+
+### Metod `Contains
