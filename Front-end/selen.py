@@ -416,6 +416,9 @@ class Selen:
         print("Expected:", expect)
         return False
 
+    def invisibilaty(self):
+        pass
+
     def is_title(self, title: str) -> bool:
         return title == self.WD.title
 
