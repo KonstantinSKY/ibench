@@ -261,7 +261,7 @@ This code does next steps:
     
     `parents([level number])`
 
-    By defauts it jumps up for 1 level
+By defauts it jumps up for 1 level
 
 
 ## Actions on elements 
@@ -270,7 +270,7 @@ This code does next steps:
     
     `click([action: bool, pause: int])`
     
-    by defaulf `action=False` `pause=0`
+By defaulf `action=False` `pause=0`
 
 
 
