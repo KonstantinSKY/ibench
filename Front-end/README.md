@@ -72,9 +72,11 @@ se.Find_element(xpath_locator)
 se.Find_element(class_locator)
 ```
 
-### `Find` and `find` are differents method
+### `Find()` and `find()` are differents method
 Methods `Find` with Capital first letter used if it calls first after the WebDriver (for All WEB page elements) and the lowercase method `find` is used when calling after another already found element.
 There are several more methods that work in the same principle. But more on that later.
+`se.Find(locator(s),[locator, locators])`
+`se.find(locator(s),[locator, locators])`
 
 It Was like:
 ```python
@@ -124,7 +126,7 @@ se.Find((Tag, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
 
-## Method `Wait` - finding and waiting for the appearance of an element on the page and not only
+## Method `Wait(*locators)` - finding and waiting for the appearance of an element on the page and not only
 The method `Wait` can take the same parameters as the `Find` method, but it will only expect the first element in the chain and the rest of the elements in the chain will be found in the same way as the find method does.
 - No exception handling is required, the logic is already inside the White method
 It was like:
@@ -247,9 +249,34 @@ This code does next steps:
 
 ## Actions on elements 
 
-### `click()`
+### `click()` click and action click in one
+
 
 ### `double_click()`
 
 ### `context_click()`
 
+### `type()`
+
+## Getting data from webdriver and elements 
+
+### `text()`
+
+### `title()`
+### `curr_url()`
+### `xpath()`
+### `count()`
+### `attr()`
+### `all_attrs()`
+
+## `sleep(second, [finish_random_delay])` advansed method for delays
+
+## 'display' and visibility
+
+## Check methods
+
+## Links
+
+## Images
+
+## Cookies
