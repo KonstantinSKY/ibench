@@ -267,23 +267,48 @@ This code does next steps:
 ## Actions on elements 
 
 ### `click()` click and action click in one
+    
+    `click([action: bool, pause: int])`
+    
+    by defaulf `action=False` `pause=0`
+
 
 
 ### `double_click()`
 
+    `double_click([pause: int])`
+
 ### `context_click()`
 
-### `type()`
+    `context_click([pause: int])`
 
-## Getting data from webdriver and elements 
+### `type()`
+    
+    `type("Text")`
+
+## Getting and cheking data from WebDriver or an element
 
 ### `text()`
+   
+    `text(["text": str])`
+    
+    - if no text argument is used here, that the Method returns text of the WebElement
+    In this case, this method is final and the chain of methods cannot continue
+    
+    - if a text argument is added in brackets, then this method compares the text arguments in brackets with the text inside the WebElement and checks
 
 ### `title()`
+    
+    `title(["text": str])`
 
 ### `curr_url()`
+    
+    `curr_url(["text": str])`
 
 ### `xpath()`
+
+This method returns absolute xpath of WebElement. The found xpath automatically performs a reverse check for the search for the element using exactly this xpath.
+This method is always final and after it the chain of methods cannot continue
 
 ### `count()`
 
