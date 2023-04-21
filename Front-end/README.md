@@ -291,11 +291,11 @@ By defaulf `action=False` `pause=0`
 ### `text()`
    
     `text(["text": str])`
-    
-    - if no text argument is used here, that the Method returns text of the WebElement
+
+- if no text argument is used here, that the Method returns text of the WebElement
     In this case, this method is final and the chain of methods cannot continue
     
-    - if a text argument is added in brackets, then this method compares the text arguments in brackets with the text inside the WebElement and checks
+- if a text argument is added in brackets, then this method compares the text arguments in brackets with the text inside the WebElement and checks
 
 ### `title()`
     
