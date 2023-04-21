@@ -76,9 +76,9 @@ se.Find_element(class_locator)
 Methods `Find` with Capital first letter used if it calls first after the WebDriver (for All WEB page elements) and the lowercase method `find` is used when calling after another already found element.
 There are several more methods that work in the same principle. But more on that later.
 
+`se.Find(locator(s),[locators(s), ... locators(s])`
 
-`se.Find(locator(s),[locator, locators])`
-`se.find(locator(s),[locator, locators])`
+`se.find(locator(s),[locator(s), ...locators(s)])`
 
 It Was like:
 ```python
