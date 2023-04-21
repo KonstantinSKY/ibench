@@ -76,7 +76,8 @@ se.Find_element(class_locator)
 Methods `Find` with Capital first letter used if it calls first after the WebDriver (for All WEB page elements) and the lowercase method `find` is used when calling after another already found element.
 There are several more methods that work in the same principle. But more on that later.
 
-`se.Find(locator(s),[locators(s), ... locators(s])` \n
+`se.Find(locator(s),[locators(s), ... locators(s])`
+
 `se.find(locator(s),[locator(s), ...locators(s)])`
 
 In Selenium Was like:
@@ -244,9 +245,24 @@ This code does next steps:
 ## More ways to find and filter elements
 ### Methods `Tag()` and `tag()`
 
-### Metods `Contains()` and `contains()`
+    `Tag("tag name")`
 
-### `parents` jump to the parent element by a different number of levels
+    `Tag("tag name")`
+
+### Metods `Contains()` and `contains()` - finding elements containing a specific date
+    
+    `Contains(data)` 
+
+    `contains(data)`
+
+    `data` - can be text (str) or attribute (dict = '{"attribute name": "attribute value"}') 
+
+### `parents()` jump to the parent element by a different number of levels
+    
+    `parents([level number])`
+
+    By defauts it jumps up for 1 level
+
 
 ## Actions on elements 
 
@@ -264,10 +280,15 @@ This code does next steps:
 ### `text()`
 
 ### `title()`
+
 ### `curr_url()`
+
 ### `xpath()`
+
 ### `count()`
+
 ### `attr()`
+
 ### `all_attrs()`
 
 ## `sleep(second, [finish_random_delay])` advansed method for delays
