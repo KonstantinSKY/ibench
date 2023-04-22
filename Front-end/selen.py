@@ -1,3 +1,4 @@
+import json
 import time
 from random import uniform
 from collections import Counter
@@ -81,9 +82,9 @@ class Selen:
         self.elems = []
         self.elem = WebElement
         self.links = []
-        self.images = []
+        self.images = {}
         self.wd_name = wd
-        self.output = None
+        self.out_str = ''
         self.WD.maximize_window()
         self.AC = ActionChains(self.WD)
         self.WDW = WebDriverWait(self.WD, 10)
@@ -91,8 +92,21 @@ class Selen:
         self.ok_assert = True
         self.ok_print = True
         self.stat = {}
-        # TODO Tag chain functions
-        # Todo Out chain function
+        self.IS = None
+
+    class Out_str(str):
+        def out(self, message=''):
+            print(message, self)
+
+    class Out_dict(dict):
+        def out(self, message=''):
+            print(message)
+            print(json.dumps(self, indent=4))
+
+    #
+    # class Out_bools(bool):
+    #     def out(self, message=''):
+    #         print(self)
 
     # Service function Fill elems variables (self.elem, self.elems after operation with WebDriver
     def __fill_elems(self, data):
@@ -120,6 +134,9 @@ class Selen:
     def print(self, *args, **kwargs):
         if self.ok_print:
             print(*args, **kwargs)
+
+    # def out(self, message=''):
+    #     print(message, self.output)
 
     # Run assertion if it set
     def assertion(self, message=''):
@@ -170,6 +187,7 @@ class Selen:
     # Find element(s) inside other element self.elem by arguments
     def find(self, *args):
         args = self.__args_normalizer(args)
+        print(args)
         for by in args:
             self.__find_one(*by)
 
@@ -181,19 +199,22 @@ class Selen:
             self.assertion(f"Previous element = {self.elem}. Cant to find next {args} element")
             return
             # trying to find element
+        print("args", args)
         try:
             elems = self.elem.find_elements(*args[:2])
         except NoSuchElementException:
             self.assertion(f"Element(s) not found: {args}")
             return
-            # Check if list of number of element present
-        if len(args) == 3 and isinstance(args[2], list) and all(isinstance(item, int) for item in args[2]):
-            try:
-                new_elems = [elems[i] for i in args[2]]
-                elems = new_elems
-            except IndexError:
-                # self.assertion(f"Indexes of Elements incorrect: {args[2]}")
-                pass
+
+        if len(args) > 2:
+            new_elems = []
+            for arg in args[2:]:
+                if isinstance(arg, int) and 0 <= arg < len(elems):
+                    new_elems.append(elems[arg])
+                else:
+                    print("Wrong index of elements", arg, "maximum is", len(elems))
+            elems = new_elems
+
         self.elems = elems
         if self.elems:
             self.elem = self.elems[0]
@@ -204,22 +225,71 @@ class Selen:
         return
 
     # Find element by tag name,  chain function for all page elements and from WebDriver directly
-    def Tag(self, tag_name: str):
+    def Tag(self, tag_name: str, *idx):
         self.elems = self.elem = self.WD
-        self.tag(tag_name)
+        self.tag(tag_name, *idx)
         return self
 
     # Find element by tag name inside other elements in self.elems
-    def tag(self, tag_name: str, extract=False):
+    def tag(self, tag_name: str, *idx):
+        self.find((TAG, tag_name, *idx))
+        return self
 
-        elems = self.elem.find_elements(By.TAG_NAME, tag_name)
-        if not elems:
-            message = f"Elements not found by TAG NAME: {tag_name}"
-            print("!!!", message)
-            self.assertion(message)
-            elems = []
-        self.__fill_elems(elems)
-        return self.elems if extract else self
+    # Find element by Class name,  chain function for all page elements and from WebDriver directly
+    def Cls(self, class_name: str, *idx):
+        self.elems = self.elem = self.WD
+        self.cls(class_name, *idx)
+        return self
+
+    # Find element by tag name inside other elements in self.elems
+    def cls(self, class_name: str, *idx):
+        self.find((CLASS, class_name, *idx))
+        return self
+
+    # Get all image from all page from WebDriver object and optional checking and install
+    def Img(self, check=False):
+        self.elems = self.elem = self.WD
+        self.img(check=check)
+        return self
+
+    # Get all image from element self.elem and optional checking and extract
+    def img(self, check=False):
+        self.tag('img')
+        self.print("Found images:", len(self.elems))
+        self.images = self.Out_dict({})
+        for image in self.elems:
+            xpath = self.xpath(image)
+            src = image.get_attribute("src")
+            alt = image.get_attribute("alt")
+            visible = image.is_displayed()
+            self.images[xpath] = {'source': src, 'alt': alt, 'visible': visible}
+            self.print(f"Image: xpath: {xpath}, source: {src}, alt = {alt}, visible: {visible}")
+            # self.WD.execute_script("arguments[0].style.display = 'block';", image)
+            if not check:
+                continue
+            ok = True
+            if not src:
+                ok = False
+                print(f"!!! Image without source, xpath: {xpath}")
+            if not visible:
+                ok = False
+                print(f"!!! Invisible Image, xpath: {xpath}")
+            if not alt:
+                ok = False
+                print(f"!!! Image without ALT attribute, xpath: {xpath}")
+            # checked if loaded
+            complete = self.WD.execute_script("return arguments[0].complete", image)
+            n_width = self.WD.execute_script("return arguments[0].naturalWidth > 0", image)
+            if not complete or not n_width:
+                ok = False
+                print(f"!!! Image not loaded, xpath:{xpath}. Arguments: Complete={complete}, naturalWidth={n_width}")
+                self.images[xpath]['loaded'] = False
+            else:
+                self.images[xpath]['loaded'] = True
+            if ok:
+                print("Checked  ... OK")
+        self.print("Got images:", len(self.images))
+        return self
 
     # Selecting Element filter by contain data(text and attributes) from all elements on Page from WD
     def Contains(self, data=None):
@@ -312,26 +382,31 @@ class Selen:
 
     # Text of element (self.elem) It has 2 mode text return or check if the text presents
     def title(self, title=''):
+        self.out_str = self.Out_str(self.WD.title)
         if title:
-            self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
+            self.IS = self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
             return self
-        return self.WD.title
+        return self.out_str
 
+    # Current URL of current page
     def curr_url(self, url=''):
+        self.out_str = self.Out_str(self.WD.current_url)
         if url:
             self.__checker(self.WD.current_url, url, "Current_URL ")
             return self
-        return self.WD.current_url
+        return self.out_str
 
     # Text of element (self.elem) It has 2 mode text return or check if the text presents
     def text(self, text=None):
+        self.out_str = self.Out_str(self.elem.text)
         if text is None:
-            return self.elem.text
-        self.__checker(self.elem.text, text, f"Text at element: {self.elem}")
+            return self.out_str
+        self.__checker(self.elem.text, text, f"Text {self.elem.text} at element: {self.xpath()}")
         return self
 
     # Type text in the element (self.elem)
     def type(self, text):
+        self.out_str = self.Out_str(self.elem.text)
         self.elem.click()
         self.elem.clear()
         self.elem.send_keys(text)
@@ -340,6 +415,7 @@ class Selen:
     # Print count of selected elements of check if the count of element == asked counts and returns
     def count(self, num=None):
         count = len(self.elems)
+        self.out_str = self.Out_str(str(count))
         if num is None:
             self.print("Count of Elements:", count)
             return count
@@ -409,17 +485,20 @@ class Selen:
     def __checker(self, got, expect, message='') -> bool:
         if got == expect:
             self.print("Checked:", message, "... OK")
+            # self.output = self.Output("True")
             return True
 
         self.assertion(f"!!! Wrong {message}")
         print("Got:", got)
         print("Expected:", expect)
+        # self.output = self.Output("False")
         return False
 
     def invisibilaty(self):
         pass
 
     def is_title(self, title: str) -> bool:
+
         return title == self.WD.title
 
     def is_curr_url(self, url) -> bool:
@@ -506,51 +585,6 @@ class Selen:
             print(f"Unable to reach: {url}")
 
     # --------- Image Methods ---------------------------
-    # Get all image from all page from WebDriver object and optional checking and install
-    def Get_images(self, extract=False, check=False):
-        self.elems = self.elem = self.WD
-        self.get_images(extract=extract, check=check)
-        return self.images if extract else self
-
-    # Get all image from element self.elem and optional checking and extract
-    def get_images(self, extract=False, check=False):
-        self.tag('img')
-        self.stat = {}
-        self.print("Found images:", len(self.elems))
-        for image in self.elems:
-            xpath = self.xpath(image)
-            self.images.append(xpath)
-            src = image.get_attribute("src")
-            alt = image.get_attribute("alt")
-            visible = image.is_displayed()
-            self.stat[xpath] = {'source': src, 'alt': alt, 'visible': visible}
-            self.print(f"Image: xpath: {xpath}, source: {src}, alt = {alt}, visible: {visible}")
-            # self.WD.execute_script("arguments[0].style.display = 'block';", image)
-            if not check:
-                continue
-            ok = True
-            if not src:
-                ok = False
-                print(f"!!! Image without source, xpath: {xpath}")
-            if not visible:
-                ok = False
-                print(f"!!! Invisible Image, xpath: {xpath}")
-            if not alt:
-                ok = False
-                print(f"!!! Image without ALT attribute, xpath: {xpath}")
-            # checked if loaded
-            complete = self.WD.execute_script("return arguments[0].complete", image)
-            n_width = self.WD.execute_script("return arguments[0].naturalWidth > 0", image)
-            if not complete or not n_width:
-                ok = False
-                print(f"!!! Image not loaded, xpath:{xpath}. Arguments: Complete={complete}, naturalWidth={n_width}")
-                self.stat[xpath]['loaded'] = False
-            else:
-                self.stat[xpath]['loaded'] = True
-            if ok:
-                print("Checked  ... OK")
-        self.print("Got images:", len(self.images))
-        return self.images if extract else self
 
     # -----------Methods for cookies  -----------------
     def add_cookies(self):
