@@ -482,7 +482,9 @@ class Selen:
         """, elem)  # Checking for correct XPATH
         try:
             self.WD.find_element(XPATH, xpath)
-            return xpath
+            self.out_str = self.Out_str(xpath)
+            return self.out_str
+
         except NoSuchElementException:
             self.assertion(f"!!! Found Incorrect abs XPATH, Got {xpath} but Can not to find Element by it")
             return None
