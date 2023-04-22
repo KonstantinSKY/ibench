@@ -289,7 +289,7 @@ class Selen:
             alt = image.get_attribute("alt")
             visible = image.is_displayed()
             self.images[xpath] = {'source': src, 'alt': alt, 'visible': visible}
-            self.print(f"Image: xpath: {xpath}, source: {src}, alt = {alt}, visible: {visible}")
+            self.print(f"Image: xpath: {xpath}\n source: {src}\n alt = {alt}\n visible: {visible}")
             # self.WD.execute_script("arguments[0].style.display = 'block';", image)
             if not check:
                 continue
