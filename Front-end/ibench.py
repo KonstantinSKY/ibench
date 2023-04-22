@@ -29,13 +29,21 @@ class iBench(Selen):
         se.WD.get(se.url)  # Get page from WD
         # New Wait method
 
-        se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?').out("h1:")
-        se.Tag("head").out("head:")
+        # Wait element and check inner text
+        se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
+
+        # se.Tag("head").out("head:")
         se.Cls('FrontPage_clientImage__3KW8O').text().out("Image Page")
 
-        se.Tag('h1', 0).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
-        print(se.title("iBench - real-time developers Hiring").IS)
-        se.curr_url("https://ibench.net/")
+        se.Tag('h1').text().out("Text of element:")
+        se.Tag('h1').xpath_query().out()
+
+        se.title().out("Page title:")
+
+
+        se.curr_url().out("URL:")  #Output URL
+
+        se.curr_url("https://ibench.net/")  #Check url
         # print(self.Get_links(check=False, asynchron=True).stat)
         se.Img(1, check=True).images.out("Images statistic")
         print(se.images)
