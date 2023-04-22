@@ -102,7 +102,7 @@ tag_locator = (TAG, "input")
 
 se.Find(xpath_locator).find(class_locator).find(tag_locator)
 ```
-## Even shorter code in method chains to find elements
+### Even shorter code in method chains to find a set of elements
 Several ways to search for elements by a chain of locators, all locators in one `Find` method  
 ```python
 # all locator as tuples inside one method 
@@ -127,6 +127,94 @@ se.Find(locators, xpath_locator, (TAG, "a"))
 se.Find((Tag, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
+## Assigning an element or elements to a variables 
+The ways of assigning elements to variables in Selen and Selenium are different
+
+Selenium Example:
+```python
+# one_element is instance of WebElement
+one_element = driver.find_element(By.XPATH, '//button[text()="Some text"]')
+
+# many_elements is list (array) of instances of WebElement
+many_elements = driver.find_elements(By.XPATH, '//button')
+```
+Selen Example:
+```python
+# one_element is instance of WebElement
+one_element = se.Find(XPATH, '//button[text()="Some text"]').elem
+
+# many_elements is list (array) of instances of WebElement
+many_elements = se.Find(XPATH, '//button').elems
+```
+`Find` and `Wait` methods find like and other similar methods return `one` element and `many` elements at the same time and stores them in internal variables: `se.elem` and `se.elems`
+
+They will be available by these names and it will also be possible to perform some actions with them until another method(s) saves new data there
+
+All  searching methods always find a array of WEB elements and gets a single WEBelement as the first element of the array
+
+`se.elem == se.elems[0]`
+
+
+## Chains of Selen methods and actions with them
+Almost all methods and actions on them can be assembled logical chains of code
+
+At the end of the code chain in one line, actions on the last found elements can be continued in a new line, because these elements are stored in the variables: `se.elen` and `se.elems` 
+```python
+email="email@gmail.com"
+se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email).parent(2).tag("span").attr('class', 'validation_status_ok')
+
+```
+The same code results:
+```python
+email = "email@email.com"
+se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email")
+se.parent(2).tag("span").attr('class', 'validation_status_ok')
+#or
+se.Find(NAME, "email")
+se.type(email).
+se.sleep(0.2, 1)
+se.attr('value', email)
+se.parent(2)
+se.tag("span")
+se.attr('class', 'validation_status_ok')
+```
+This code does next steps:
+- found WebElement by attribute `NAME="email"`
+- type text from the `email` variable to the WebElement
+- random delay from 0.2 to 1 seconds
+- check for new WebElement attribute `'value'= email`
+- found new parrent element to 2 levels up
+- found element by Tag `span`
+- check attribute `'class' = 'validation_status_ok'`
+
+
+## Findind by locators and indexes of element in array of elements in `se.elems`
+sometimes we need to find a lot of elements then select one or more of them by index and continue searching inside it
+
+In Selenium: 
+```python
+driver.find_elements(By.XPATH, "//xpath string...")[3].find_element(By.CLASS_NAME, Login_submit_wrapper__2-PYe)
+```
+In Selen
+```python
+se.Find(XPATH, "//xpath string...", 3).find(CLASS, Login_submit_wrapper__2-PYe)
+or 
+se.Find((XPATH, "//xpath string...", 3), (CLASS, Login_submit_wrapper__2-PYe))
+```
+
+as well we can select WebElement any set of indexes
+```Python
+
+se.Find((XPATH, "//xpath string...", 0, 3, 5, ...), (CLASS, Login_submit_wrapper__2-PYe))
+
+```
+So, the full rule of using `Find` and `find` is:
+
+`Find()`
+- this way is suitable and can be used in any search operator
+
+
+
 
 ## Method `Wait()` - finding and waiting for the appearance of an element on the page and not only
 The method `Wait` can take the same parameters as the `Find` method, but it will only expect the first element in the chain and the rest of the elements in the chain will be found in the same way as the find method does.
@@ -182,89 +270,10 @@ se.Wait((TAG, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
 
-## Assigning an element or elements to a variables 
-The ways of assigning elements to variables in Selen and Selenium are different
 
-Selenium Example:
-```python
-# one_element is instance of WebElement
-one_element = driver.find_element(By.XPATH, '//button[text()="Some text"]')
-
-# many_elements is list (array) of instances of WebElement
-many_elements = driver.find_elements(By.XPATH, '//button')
-```
-Selen Example:
-```python
-# one_element is instance of WebElement
-one_element = se.Find(XPATH, '//button[text()="Some text"]').elem
-
-# many_elements is list (array) of instances of WebElement
-many_elements = se.Find(XPATH, '//button').elems
-```
-`Find` and `Wait` methods find like and other similar methods return `one` element and `many` elements at the same time and stores them in internal variables: `se.elem` and `se.elems`
-
-They will be available by these names and it will also be possible to perform some actions with them until another method(s) saves new data there
-
-All  searching methods always find a array of WEB elements and gets a single WEBelement as the first element of the array
-
-`se.elem == se.elems[0]`
-
-## Chains of Selen methods and actions with them
-Almost all methods and actions on them can be assembled logical chains of code
-
-At the end of the code chain in one line, actions on the last found elements can be continued in a new line, because these elements are stored in the variables: `se.elen` and `se.elems` 
-```python
-email="email@gmail.com"
-se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email).parent(2).tag("span").attr('class', 'validation_status_ok')
-
-```
-The same code results:
-```python
-email = "email@email.com"
-se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email")
-se.parent(2).tag("span").attr('class', 'validation_status_ok')
-#or
-se.Find(NAME, "email")
-se.type(email).
-se.sleep(0.2, 1)
-se.attr('value', email)
-se.parent(2)
-se.tag("span")
-se.attr('class', 'validation_status_ok')
-```
-This code does next steps:
-- found WebElement by attribute `NAME="email"`
-- type text from the `email` variable to the WebElement
-- random delay from 0.2 to 1 seconds
-- check for new WebElement attribute `'value'= email`
-- found new parrent element to 2 levels up
-- found element by Tag `span`
-- check attribute `'class' = 'validation_status_ok'`
-
-## Findind by locators and indexes of element in array of elements in `se.elems`
-sometimes we need to find a lot of elements then select one or more of them by index and continue searching inside it
-
-In Selenium: 
-```python
-driver.find_elements(By.XPATH, "//xpath string...")[3].find_element(By.CLASS_NAME, Login_submit_wrapper__2-PYe)
-```
-In Selen
-```python
-se.Find(XPATH, "//xpath string...", 3).find(CLASS, Login_submit_wrapper__2-PYe)
-or 
-se.Find((XPATH, "//xpath string...", 3), (CLASS, Login_submit_wrapper__2-PYe))
-```
-
-as well we can select WebElement any set of indexes
-```Python
-
-se.Find((XPATH, "//xpath string...", 0, 3, 5, [...]), (CLASS, Login_submit_wrapper__2-PYe))
-
-```
-- this way is suitable and can be used in any search operator
 
 ## More ways to find and filter elements
-### Methods `Tag()` and `tag()` finding elements only by tag
+### Methods `Tag()` and `tag()` finding element(s) only by tag
 
     `Tag("tag name")`
 
