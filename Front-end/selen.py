@@ -155,7 +155,7 @@ class Selen:
         time.sleep(uniform(seconds, finish))
         return self
 
-    # --------   Functions of findins, selecting elements -----------
+    # --------   Functions of findings, selecting elements -----------
     # The Wait chain function finds and waits for appear element and save elems variables
     def Wait(self, *args):
         self.__start()
@@ -248,6 +248,7 @@ class Selen:
         return self
 
         # Find element by Class name,  chain function for all page elements and from WebDriver directly
+
     def Xpath(self, query: str, *idx):
         self.__start()
         self.cls(query, *idx)
@@ -261,16 +262,16 @@ class Selen:
 
     def Id(self, id_name: str, *idx):
         self.Find(id_name, *idx)
-        
+
     # Get all image from all page from WebDriver object and optional checking and install
-    def Img(self, check=False):
+    def Img(self, *idx, check=False):
         self.__start()
-        self.img(check=check)
+        self.img(*idx, check=check)
         return self
 
     # Get all image from element self.elem and optional checking and extract
-    def img(self, check=False):
-        self.tag('img')
+    def img(self, *idx, check=False):
+        self.tag('img', *idx)
         self.print("Found images:", len(self.elems))
         self.images = self.Out_dict({})
         for image in self.elems:
@@ -308,18 +309,15 @@ class Selen:
         return self
 
     # Selecting Element filter by contain data(text and attributes) from all elements on Page from WD
-    def Contains(self, data=None):
+    def Contains(self, data, *idxs):
         self.__start()
         self.__fill_elems(self.WD.find_elements(XPATH, "//*"))
         self.print("Count", len(self.elems))
 
-        if data is None:
-            return self
-
-        self.contains(data)
+        self.contains(data, *idxs)
 
     # Selecting Element filter by contain data(text and attributes) from other element self.elem
-    def contains(self, data):
+    def contains(self, data, *idxs):
         elems = []
         if isinstance(data, dict):
             for self.elem in self.elems:
@@ -342,6 +340,15 @@ class Selen:
                     continue
                 elems.append(elem)
 
+        if len(idxs) > 0:
+            new_elems = []
+            for idx in idxs[2:]:
+                if isinstance(idx, int) and 0 <= idx < len(elems):
+                    new_elems.append(elems[idx])
+                else:
+                    print("Wrong index of elements", idx, "maximum is", len(elems))
+            elems = new_elems
+
         self.__fill_elems(elems)
         return self
 
@@ -350,7 +357,7 @@ class Selen:
         self.IS = None
         for i in range(levels):
             try:
-                self.__fill_elems(self.elem.find_element(By.XPATH, '..'))
+                self.__fill_elems(self.find(XPATH, '..'))
             except NoSuchElementException:
                 self.assertion(f"Parent Element at level {i} not found")
         return self
