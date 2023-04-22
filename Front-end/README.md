@@ -15,7 +15,7 @@ this is a mini framework or an add-on for the selenium and unitest frameworks
 
 ### New find method and simplified adding locators as method arguments
 
-It was like this:
+In Selenium it was like this:
 ```python
 
 driver.find_element(By.ID, "id")
@@ -28,8 +28,8 @@ driver.find_element(By.CLASS_NAME, "class name")
 driver.find_element(By.CSS_SELECTOR, "css selector")
 
 ```
-Now is:
-```pyhton
+in Selen now is:
+```python
 se.Find(ID, "id")
 se.Find(NAME, "name")
 se.Find(XPATH, "xpath")
@@ -39,10 +39,11 @@ se.Find(TAG, "tag name")
 se.Find(CLASS, "class name")
 se.Find(CSS, "css selector")
 ```
-******- `se` is short from `self`
+
+******-`se` is short from `self`
 
 ### Simplified adding locators to methods by several variants
-It Was like:
+In usual Selenium Was like:
 ```python
 driver.find_element(By.XPATH, "//body/div[@id='fb-root']/div[@id='root']/div[1]/div[1]/div[2]/div[1]")
 driver.find_element(By.CLASS_NAME, ""Login_submit_wrapper__2-PYe"")
