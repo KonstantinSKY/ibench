@@ -358,14 +358,13 @@ when using this method, you do not need to click on the element and clear it, th
 
 ## Getting and checking  WebDriver or WebElement(s) data
 
-### `text()`  - Text of WebElement
+### `text()`  - Text of WebElement(s)
    
     `text(["text": str])`
 
 `text: str` - is optional parametr
 
 - if no text argument is used here, that the Method returns text of the WebElement
-    In this case, this method is final and the chain of methods cannot continue
     
 - if a text argument is added in brackets, then this method compares the text arguments in brackets with the text inside the WebElement and checks
 
@@ -374,7 +373,6 @@ when using this method, you do not need to click on the element and clear it, th
     `title(["text": str])`
 
 - if no text argument is used here, that the Method returns the Title  of Web PageWeb.
-In this case, this method is final and the chain of methods cannot continue
     
 - if a text argument is added in brackets, then this method compares the text arguments in brackets with the Title of current WebPage and checks
 
@@ -382,7 +380,6 @@ In this case, this method is final and the chain of methods cannot continue
 
     `curr_url(["text": str])`
 - if no text argument is used here, that the Method returns URL of curent opened page
-    In this case, this method is final and the chain of methods cannot continue
     
 - if a text argument is added in brackets, then this method compares the text arguments in brackets with the URL of The opened  the WebPage and checks
 
@@ -417,6 +414,8 @@ This method checks if the element contains the specified attribute
 ### `out()` - content output to STDOUT 
 
     `out([message: str])`
+
+### `IS` - return boolean, as result of checking element
 
 ### sleep - Advansed method for delays
 
