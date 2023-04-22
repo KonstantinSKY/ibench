@@ -39,7 +39,7 @@ se.Find(TAG, "tag name")
 se.Find(CLASS, "class name")
 se.Find(CSS, "css selector")
 ```
-
+- No exception handling is required, the logic is already inside the White method
 ***-`se` is short from `self`
 
 ### Simplified adding locators to methods by several variants
@@ -215,12 +215,17 @@ So, the full rule of using `Find` and `find` is:
 
 `find(locator, [locators])`
 
+And rule of one locator
+`locator = ('BY', content, [indexes ..])`
+
 - this way is suitable and can be used in any finding operator
 
 ## More ways to find and filter elements
 ### Method `Wait()` - finding and waiting for the appearance of an element on the page and not only
 The method `Wait` can take the same parameters as the `Find` method, but it will only expect the first element in the chain and the rest of the elements in the chain will be found in the same way as the find method does.
 - No exception handling is required, the logic is already inside the White method
+
+`Wait(locator, [locators])`
 
 In Selenium it was like:
 ```python
@@ -273,19 +278,43 @@ se.Wait((TAG, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
 
-### Methods `Tag()` and `tag()` finding element(s) only by tag
+### Methods `Tag()` and `tag()` finding element(s) only by Tag Name
 
-    `Tag("tag name")`
+    `Tag("tag name", [ index, index2, .., index n ])`
 
-    `tag("tag name")`
+    `tag("tag name", [ index, index2, .., index n ])`
+
+### Methods `Cls()` and `cls()` finding element(s) only by Class Name
+
+    `Cls("class name",  [ index, index2, .., index n ])`
+
+    `cls("class name", [ index, index2, .., index n ])`
+
+### Methods `Xpath()` and `xpath()` finding element(s) only by xpath
+
+    `Xpath("xpath query", [ index, index2, .., index n ])`
+
+    `xpath("xpath query", [ index, index2, .., index n ])`
+
+### Methods `Id()`  finding element only by ID
+
+    `Id("ID", [ index, index2, .., index n ])`
 
 ### Metods `Contains()` and `contains()` - finding elements containing a specific date
     
-    `Contains(data)` 
+    `Contains(data, [ index, index2, .., index n ])` 
 
-    `contains(data)`
+    `contains(data, [ index, index2, .., index n ])`
 
-`data` - can be text (str) or attribute (dict = '{"attribute name": "attribute value"}') 
+`data` - can be text of WebElement (str) or attribute of WebElement (dict = '{"attribute name": "attribute value"}') 
+
+### Metods `Img()` and `img()` - finding elements containing a specific date
+    
+    `Img([ index, index2, .., index n ])` 
+
+    `img([ index, index2, .., index n ])`
+
+`data` - can be text of WebElement (str) or attribute of WebElement (dict = '{"attribute name": "attribute value"}') 
 
 ### `parents()` jump to the parent element by a different number of levels
     
