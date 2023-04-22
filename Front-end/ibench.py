@@ -37,7 +37,7 @@ class iBench(Selen):
         print(se.title("iBench - real-time developers Hiring").IS)
         se.curr_url("https://ibench.net/")
         # print(self.Get_links(check=False, asynchron=True).stat)
-        se.Img().images.out("Images statistic")
+        se.Img(1, check=True).images.out("Images statistic")
         print(se.images)
         # sleep(10)
 
