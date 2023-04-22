@@ -189,7 +189,7 @@ This code does next steps:
 - find element by Tag `span`
 - check attribute `'class' = 'validation_status_ok'`
 
-## Findind by locators and indexes of element in array of elements in `se.elems`
+## Findind by locators with indexes of element in array of elements in `se.elems`
 Sometimes we need to find a lot of elements then select one or more of them by index and continue searching inside it
 
 In Selenium: 
@@ -211,9 +211,9 @@ se.Find((XPATH, "//xpath string...", 0, 3, 5, ...), (CLASS, Login_submit_wrapper
 ```
 So, the full rule of using `Find` and `find` is:
 
-`Find(locator, [locators], [indexes])`
+`Find(locator, [locators])`
 
-`Find(locator, [locators], [indexes])`
+`find(locator, [locators])`
 
 - this way is suitable and can be used in any finding operator
 
