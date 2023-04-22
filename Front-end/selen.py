@@ -103,6 +103,15 @@ class Selen:
             print(message)
             print(json.dumps(self, indent=4))
 
+    def out(self, message=''):
+        print(message)
+        print("WebElement")
+        print(self.elem.get_attribute("outerHTML"))
+        web_elem = {"tag name": self.elem.tag_name,
+                    "abs xpath": self.xpath_query(),
+                    "attributes": self.all_attrs()}
+        print(json.dumps(web_elem, indent=4))
+
     def __start(self):
         self.elems = self.elem = self.WD
         self.IS = None
