@@ -38,18 +38,18 @@ class iBench(Selen):
         se.Tag('h1').text().out("Text of element:")
         se.Tag('h1').xpath_query().out()
 
-
-        se.title()
-        se.title().out("Page title:") # Output of page title
+        se.title('iBench - real-time developers Hiring')  # Check title
+        se.title().out("Page title:")  # Output of page title
 
         se.Cls('FrontPage_btnWrapper__2Q75S').out("Wrapper element:")
 
-        se.curr_url().out("URL:")  #Output URL
-
-        se.curr_url("https://ibench.net/")  #Check url
+        se.curr_url().out("URL:")  # Output URL
+        se.curr_url("https://ibench.net/")  # Check url
         # print(self.Get_links(check=False, asynchron=True).stat)
-        se.Img(1).images.out("Images statistic:")
-        # sleep(10)
+
+        # Checking images on the page
+        se.Img(1).images.out("Images statistic:")  # Output statistic of one element
+        se.Img(check=True)  # Check all Images
 
         # self.check_links_a()
         se.sleep(5)
@@ -76,7 +76,8 @@ class iBench(Selen):
         self.Wait(l_h2).text("Log in")
         self.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
 
-        self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span").attr('class', 'validation_status_ok')
+        self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span").attr('class',
+                                                                                                        'validation_status_ok')
         self.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).parent(2).tag("span")
         self.attr('class', 'validation_status_ok')
 
