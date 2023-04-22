@@ -40,7 +40,7 @@ se.Find(TAG, "tag name")
 se.Find(CLASS, "class name")
 se.Find(CSS, "css selector")
 ```
-******* `se` it is short from `self`
+******- `se` is short from `self`
 
 ### Simplified adding locators to methods by several variants
 It Was like:
@@ -128,7 +128,7 @@ se.Find((Tag, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
 
-## Method `Wait(*locators)` - finding and waiting for the appearance of an element on the page and not only
+## Method `Wait()` - finding and waiting for the appearance of an element on the page and not only
 The method `Wait` can take the same parameters as the `Find` method, but it will only expect the first element in the chain and the rest of the elements in the chain will be found in the same way as the find method does.
 - No exception handling is required, the logic is already inside the White method
 It was like:
@@ -250,16 +250,18 @@ driver.find_elements(By.XPATH, "//xpath string...")[3].find_element(By.CLASS_NAM
 ```
 In Selen
 ```python
-se.Find(XPATH, "//xpath string...", [3]).find(CLASS, Login_submit_wrapper__2-PYe)
+se.Find(XPATH, "//xpath string...", 3).find(CLASS, Login_submit_wrapper__2-PYe)
 or 
-se.Find((XPATH, "//xpath string...", [3]), (CLASS, Login_submit_wrapper__2-PYe))
+se.Find((XPATH, "//xpath string...", 3), (CLASS, Login_submit_wrapper__2-PYe))
 ```
 
 as well we can select WebElement any set of indexes
 ```Python
 
-se.Find((XPATH, "//xpath string...", [3]), (CLASS, Login_submit_wrapper__2-PYe))
+se.Find((XPATH, "//xpath string...", 0, 3, 5, [...]), (CLASS, Login_submit_wrapper__2-PYe))
+
 ```
+- this way is suitable and can be used in any search operator
 
 ## More ways to find and filter elements
 ### Methods `Tag()` and `tag()` finding elements only by tag
