@@ -104,11 +104,11 @@ class Selen:
             print(json.dumps(self, indent=4))
 
     def out(self, message=''):
-        print(message)
-        print("WebElement")
+        print(message, "WebElement")
         print(self.elem.get_attribute("outerHTML"))
         web_elem = {"tag name": self.elem.tag_name,
                     "abs xpath": self.xpath_query(),
+                    "visible": self.elem.is_displayed(),
                     "attributes": self.all_attrs()}
         print(json.dumps(web_elem, indent=4))
 
