@@ -32,21 +32,23 @@ class iBench(Selen):
         # Wait element and check inner text
         se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
 
-        # se.Tag("head").out("head:")
+        se.Tag("head").out("head:")
         se.Cls('FrontPage_clientImage__3KW8O').text().out("Image Page")
 
         se.Tag('h1').text().out("Text of element:")
         se.Tag('h1').xpath_query().out()
 
-        se.title().out("Page title:")
 
+        se.title()
+        se.title().out("Page title:") # Output of page title
+
+        se.Cls('FrontPage_btnWrapper__2Q75S').out("Wrapper element:")
 
         se.curr_url().out("URL:")  #Output URL
 
         se.curr_url("https://ibench.net/")  #Check url
         # print(self.Get_links(check=False, asynchron=True).stat)
-        se.Img(1, check=True).images.out("Images statistic")
-        print(se.images)
+        se.Img(1).images.out("Images statistic:")
         # sleep(10)
 
         # self.check_links_a()
