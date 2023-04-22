@@ -241,13 +241,32 @@ This code does next steps:
 - found element by Tag `span`
 - check attribute `'class' = 'validation_status_ok'`
 
+## Findind by locators and indexes of element in array of elements in `se.elems`
+sometimes we need to find a lot of elements then select one or more of them by index and continue searching inside it
+
+In Selenium: 
+```python
+driver.find_elements(By.XPATH, "//xpath string...")[3].find_element(By.CLASS_NAME, Login_submit_wrapper__2-PYe)
+```
+In Selen
+```python
+se.Find(XPATH, "//xpath string...", [3]).find(CLASS, Login_submit_wrapper__2-PYe)
+or 
+se.Find((XPATH, "//xpath string...", [3]), (CLASS, Login_submit_wrapper__2-PYe))
+```
+
+as well we can select WebElement any set of indexes
+```Python
+
+se.Find((XPATH, "//xpath string...", [3]), (CLASS, Login_submit_wrapper__2-PYe))
+```
 
 ## More ways to find and filter elements
-### Methods `Tag()` and `tag()`
+### Methods `Tag()` and `tag()` finding elements only by tag
 
     `Tag("tag name")`
 
-    `Tag("tag name")`
+    `tag("tag name")`
 
 ### Metods `Contains()` and `contains()` - finding elements containing a specific date
     
@@ -255,7 +274,7 @@ This code does next steps:
 
     `contains(data)`
 
-    `data` - can be text (str) or attribute (dict = '{"attribute name": "attribute value"}') 
+`data` - can be text (str) or attribute (dict = '{"attribute name": "attribute value"}') 
 
 ### `parents()` jump to the parent element by a different number of levels
     
@@ -272,23 +291,30 @@ By defauts it jumps up for 1 level
     
 By defaulf `action=False` `pause=0`
 
+In this case `action=False` - a simple click
+
+In this case `action=True` - a click through the Selenium action.chain
+
+`pause` only works in the second case through the Selenium action.chain by setting a pause in seconds between moving the cursor to the element and directly clicking
 
 
 ### `double_click()`
 
     `double_click([pause: int])`
 
-### `context_click()`
+### `context_click()` 
 
     `context_click([pause: int])`
 
-### `type()`
+### `type()` - inserts text into the selected WebWlement
     
     `type("Text")`
 
+when using this method, you do not need to click on the element and clear it, this logic is already inside
+
 ## Getting and cheking data from WebDriver or an element
 
-### `text()`
+### `text()`  - Text of WebElement
    
     `text(["text": str])`
 
@@ -297,28 +323,63 @@ By defaulf `action=False` `pause=0`
     
 - if a text argument is added in brackets, then this method compares the text arguments in brackets with the text inside the WebElement and checks
 
-### `title()`
+### `title()` - The Title of opened page
     
     `title(["text": str])`
 
-### `curr_url()`
+- if no text argument is used here, that the Method returns the Title  of Web PageWeb.
+In this case, this method is final and the chain of methods cannot continue
     
-    `curr_url(["text": str])`
+- if a text argument is added in brackets, then this method compares the text arguments in brackets with the Title of current WebPage and checks
 
-### `xpath()`
+### `curr_url()` - The Current URL of opened page
+
+    `curr_url(["text": str])`
+- if no text argument is used here, that the Method returns URL of curent opened page
+    In this case, this method is final and the chain of methods cannot continue
+    
+- if a text argument is added in brackets, then this method compares the text arguments in brackets with the URL of The opened  the WebPage and checks
+
+
+### `xpath()` - Absolute XPATH of WebElements
 
 This method returns absolute xpath of WebElement. The found xpath automatically performs a reverse check for the search for the element using exactly this xpath.
 This method is always final and after it the chain of methods cannot continue
 
-### `count()`
+### `count()` - Numbers of found Elements
 
-### `attr()`
+    `count([number: int])`
+- if no text argument is used here, that the Method returns count of the WebElements in `se.elems`. In this case, this method is final and the chain of methods cannot continue
+    
+- if an integer argument is added in brackets, then this method compares the number with the real counts of the selected WebElement and checks
 
-### `all_attrs()`
+### `attr()`  - Get or check of WebElements attributes
 
-## `sleep(second, [finish_random_delay])` advansed method for delays
+    `attr("attr_name", ["value"])`
 
-## 'display' and visibility
+This method checks if the element contains the specified attribute 
+
+- if the attribute is exists and `value` is present, it checks if the attribute is equal to this value. 
+
+- if the value is not specified, then the method returns the attribute value. In this case, this method is final and the chain of methods cannot continue
+ 
+
+### `all_attrs()` - Get all attributes of WebElement
+
+## Advanced Methods 
+
+### sleep - Advansed method for delays
+
+`sleep(second, [finish_random_delay])`
+
+if only the first argument is specified, the delay occurs for the number of seconds equal to this argument
+
+if the second argument is specified, then the delay occurs as a random time in seconds between the first and second arguments
+
+
+### 'display' - show the element if it is hidden
+
+and visibility
 
 ## Check methods
 
