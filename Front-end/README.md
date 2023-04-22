@@ -411,9 +411,12 @@ This method checks if the element contains the specified attribute
 
 ## Advanced Methods
 
-### `out()` - content output to STDOUT 
+### `out()` - content output to STDOUT
 
     `out([message: str])`
+
+The content that this method displays on the screen depends on the method after which it is applied
+-
 
 ### `IS` - return boolean, as result of checking element
 
