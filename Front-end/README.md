@@ -40,7 +40,7 @@ se.Find(CLASS, "class name")
 se.Find(CSS, "css selector")
 ```
 
-******-`se` is short from `self`
+***-`se` is short from `self`
 
 ### Simplified adding locators to methods by several variants
 In usual Selenium Was like:
