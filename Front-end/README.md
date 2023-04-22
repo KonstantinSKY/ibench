@@ -415,8 +415,36 @@ This method checks if the element contains the specified attribute
 
     `out([message: str])`
 
+`message` - this is the default parameter which accepts the text to be displayed before the content
+
 The content that this method displays on the screen depends on the method after which it is applied
--
+
+If this method follows a method that returns text then the output will be text
+```python
+se.Tag('h1').text().out("Text of element:")
+#result
+"""
+Text of element: Looking for a developers, UX/UI designer, QA or DevOps...or development agency?
+"""
+
+se.title().out("Page Title")
+#result:
+"""
+Page title: iBench - real-time developers Hiring
+"""
+
+se.curr_url().out("URL:")
+#result:
+"""
+URL: https://ibench.net/
+"""
+se.Tag('h1').xpath_query().out()
+#result:
+"""
+/html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/h1[1]
+"""
+
+```
 
 ### `IS` - return boolean, as result of checking element
 
