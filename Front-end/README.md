@@ -310,11 +310,11 @@ se.Wait((TAG, "a"), xpath_locators, locators)
 
 ### Metods `Img()` and `img()` - finding elements containing a specific date
     
-    `Img([ index, index2, .., index n ])` 
+    `Img([ index, index2, .., index n ][check=bool])` 
 
-    `img([ index, index2, .., index n ])`
+    `img([ index, index2, .., index n ][check=bool])`
 
-`data` - can be text of WebElement (str) or attribute of WebElement (dict = '{"attribute name": "attribute value"}') 
+- By default `check = False`
 
 ### `parents()` jump to the parent element by a different number of levels
     
@@ -323,11 +323,11 @@ se.Wait((TAG, "a"), xpath_locators, locators)
 By defauts it jumps up for 1 level
 
 
-## Actions on elements 
+## Actions with elements 
 
 ### `click()` click and action click in one
     
-    `click([action: bool, pause: int])`
+    `click([action=bool, pause=second(int) ])`
     
 By defaulf `action=False` `pause=0`
 
@@ -338,25 +338,31 @@ In this case `action=True` - a click through the Selenium action.chain
 `pause` only works in the second case through the Selenium action.chain by setting a pause in seconds between moving the cursor to the element and directly clicking
 
 
-### `double_click()`
+### `double_click()` - double click
 
-    `double_click([pause: int])`
+    `double_click([pause=second(int)])`
 
-### `context_click()` 
+### `context_click()` -context click or usually slick by right mouse button
 
-    `context_click([pause: int])`
+    `context_click([pause=second(int)])`  
 
 ### `type()` - inserts text into the selected WebWlement
     
     `type("Text")`
+Examples:
+```python
+
+```
 
 when using this method, you do not need to click on the element and clear it, this logic is already inside
 
-## Getting and cheking data from WebDriver or an element
+## Getting and checking  WebDriver or WebElement(s) data
 
 ### `text()`  - Text of WebElement
    
     `text(["text": str])`
+
+`text: str` - is optional parametr
 
 - if no text argument is used here, that the Method returns text of the WebElement
     In this case, this method is final and the chain of methods cannot continue
@@ -381,7 +387,7 @@ In this case, this method is final and the chain of methods cannot continue
 - if a text argument is added in brackets, then this method compares the text arguments in brackets with the URL of The opened  the WebPage and checks
 
 
-### `xpath()` - Absolute XPATH of WebElements
+### `xpath_query()` - Absolute XPATH of WebElements
 
 This method returns absolute xpath of WebElement. The found xpath automatically performs a reverse check for the search for the element using exactly this xpath.
 This method is always final and after it the chain of methods cannot continue
@@ -406,7 +412,11 @@ This method checks if the element contains the specified attribute
 
 ### `all_attrs()` - Get all attributes of WebElement
 
-## Advanced Methods 
+## Advanced Methods
+
+### `out()` - content output to STDOUT 
+
+    `out([message: str])`
 
 ### sleep - Advansed method for delays
 
