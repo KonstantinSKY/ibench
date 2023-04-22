@@ -419,7 +419,25 @@ This method checks if the element contains the specified attribute
 
 The content that this method displays on the screen depends on the method after which it is applied
 
-If this method follows a method that returns text then the output will be text
+If `out()` follows a method that found and/or returns WebElement then out put will be context of WebElement
+```python
+se.Cls('FrontPage_btnWrapper__2Q75S').out("Wrapper element:")
+# Result:
+"""
+Wrapper element: WebElement
+<div class="FrontPage_btnWrapper__2Q75S"><a class="FrontPage_btn__2yqXx" href="/registration-startup">I want to try iBench</a><div class="FrontPage_btnTip__3yVoD">Our service is free for you</div></div>
+{
+    "tag name": "div",
+    "abs xpath": "/html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]",
+    "visible": true,
+    "attributes": {
+        "class": "FrontPage_btnWrapper__2Q75S"
+    }
+}
+"""
+```
+
+If `out()` follows a method that returns text then the output will be text
 ```python
 se.Tag('h1').text().out("Text of element:")
 #result
@@ -443,8 +461,28 @@ se.Tag('h1').xpath_query().out()
 """
 /html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/h1[1]
 """
-
 ```
+
+If `out()` follows a method that returns dictionary then the output will be text
+```python
+se.Img(1).images.out("Images statistic:")
+'''
+Result:
+
+Images statistic
+{
+    "/html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/img[1]": {
+        "source": "https://ibench.net/static/media/for-client.7fc250cc.webp",
+        "alt": "Marketplace",
+        "visible": true,
+        "loaded": true
+    }
+}
+'''
+```
+
+
+
 
 ### `IS` - return boolean, as result of checking element
 
