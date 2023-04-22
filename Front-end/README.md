@@ -71,6 +71,7 @@ class_locator = (CLASS, "Login_submit_wrapper__2-PYe"")
 se.Find_element(xpath_locator)
 se.Find_element(class_locator)
 ```
+## Principles and rules of the Selen using
 
 ### `Find()` and `find()` are differents method
 Methods `Find` with Capital first letter used if it calls first after the WebDriver (for All WEB page elements) and the lowercase method `find` is used when calling after another already found element.
@@ -80,7 +81,7 @@ There are several more methods that work in the same principle. But more on that
 
 `se.find(locator(s),[locator(s), ...locators(s)])`
 
-In Selenium Was like:
+In Selenium Was:
 ```python
 driver.find_element(By.XPATH, "//xpath string...").find_element(By.CLASS_NAME, Login_submit_wrapper__2-PYe)
 
@@ -127,7 +128,7 @@ se.Find(locators, xpath_locator, (TAG, "a"))
 se.Find((Tag, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
-## Assigning an element or elements to a variables 
+### Assigning an element or elements to a variables 
 The ways of assigning elements to variables in Selen and Selenium are different
 
 Selenium Example:
@@ -146,19 +147,20 @@ one_element = se.Find(XPATH, '//button[text()="Some text"]').elem
 # many_elements is list (array) of instances of WebElement
 many_elements = se.Find(XPATH, '//button').elems
 ```
-`Find` and `Wait` methods find like and other similar methods return `one` element and `many` elements at the same time and stores them in internal variables: `se.elem` and `se.elems`
+`Find` and other methods of finding WebElements and other similar methods return `one` WebElement and `many` WebElements at the same time and stores them in internal variables: `se.elem` and `se.elems`
 
 They will be available by these names and it will also be possible to perform some actions with them until another method(s) saves new data there
 
-All  searching methods always find a array of WEB elements and gets a single WEBelement as the first element of the array
+All  searching methods always find a array of WebElements and gets a single WebWlement as the first element of the array
 
 `se.elem == se.elems[0]`
 
 
-## Chains of Selen methods and actions with them
-Almost all methods and actions on them can be assembled logical chains of code
+### Chains of Selen methods and actions with them
+Almost all methods of finding WebElements and actions on them can be assembled logical chains of code
 
-At the end of the code chain in one line, actions on the last found elements can be continued in a new line, because these elements are stored in the variables: `se.elen` and `se.elems` 
+If the code chain in one line getting the end, but actions on the last found elements can be continued in a new line, because these elements are stored in the variables: `se.elen` and `se.elems` 
+Exampe:
 ```python
 email="email@gmail.com"
 se.Find(NAME, "email").type(email).sleep(0.2, 1).attr('value', email).parent(2).tag("span").attr('class', 'validation_status_ok')
@@ -183,10 +185,9 @@ This code does next steps:
 - type text from the `email` variable to the WebElement
 - random delay from 0.2 to 1 seconds
 - check for new WebElement attribute `'value'= email`
-- found new parrent element to 2 levels up
-- found element by Tag `span`
+- find new parrent element to 2 levels up
+- find element by Tag `span`
 - check attribute `'class' = 'validation_status_ok'`
-
 
 ## Findind by locators and indexes of element in array of elements in `se.elems`
 sometimes we need to find a lot of elements then select one or more of them by index and continue searching inside it
