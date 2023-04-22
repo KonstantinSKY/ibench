@@ -28,16 +28,17 @@ class iBench(Selen):
     def main_page(se):
         se.WD.get(se.url)  # Get page from WD
         # New Wait method
-        print()
+        se.Wait(l_h1).text().out("TEST message:::::")
         se.Wait(l_h1).text()
-
         se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
+        se.Cls('FrontPage_clientImage__3KW8O').text().out("Image Page")
 
-        se.Tag('h1').text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
-        se.title("iBench - real-time developers Hiring")
+        se.Tag('h1', 0).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
+        print(se.title("iBench - real-time developers Hiring").IS)
         se.curr_url("https://ibench.net/")
         # print(self.Get_links(check=False, asynchron=True).stat)
-        # print(self.Get_images(check=True, extract=True))
+        se.Img().images.out("Images statistic")
+        print(se.images)
         # sleep(10)
 
         # self.check_links_a()
@@ -47,14 +48,14 @@ class iBench(Selen):
         # print(self.Tag("a").text1("Log in").elem)
         # self.Find(self.l_fp_registration)
         # self.Find(CLASS, 'FrontPage_btnWrapper__2Q75S')
-        # self.Find(CLASS, 'FrontPage_btnWrapper__2Q75S', [0])
+        print(se.Find(CLASS, 'FrontPage_btnWrapper__2Q75S', 0))
         # self.Find(self.l_login_btn)
         # self.Find(self.l_login_fields)
         # # self.Find(self.l_check_button, self.l_btn_wrap)
 
     def login(self):
         lc_fields = ((CLASS, "Login_form__2mvFD"), (TAG, "input"))
-        lc_submit_button = ((CLASS,"Login_submit_wrapper__2-PYe"), (TAG, "button"))
+        lc_submit_button = ((CLASS, "Login_submit_wrapper__2-PYe"), (TAG, "button"))
         lc_validation = ((CLASS, "Login_form__2mvFD"), (CLASS, "form_group"))
         l_valid = (CLASS, "FrontPage_registrationLinks__2DkiO")
 
@@ -105,16 +106,17 @@ class iBench(Selen):
         pass
 
     def main(se):
-        se.Find(ID, "id")
-        se.Find(NAME, "name")
-        se.Find(XPATH, "xpath")
-        se.Find(LINK, "link text")
-        se.Find(PART_LINK, "partial link text")
-        se.Find(TAG, "tag name")
-        se.Find(CLASS, "class name")
-        se.Find(CSS, "css selector")
+        pass
+        # se.Find(ID, "id")
+        # se.Find(NAME, "name")
+        # se.Find(XPATH, "xpath")
+        # se.Find(LINK, "link text")
+        # se.Find(PART_LINK, "partial link text")
+        # se.Find(TAG, "tag name")
+        # se.Find(CLASS, "class name")
+        # se.Find(CSS, "css selector")
 
 
 if __name__ == "__main__":
-    iBench().main()
+    iBench().main_page()
     sleep(10)
