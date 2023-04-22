@@ -103,10 +103,9 @@ class Selen:
             print(message)
             print(json.dumps(self, indent=4))
 
-    #
-    # class Out_bools(bool):
-    #     def out(self, message=''):
-    #         print(self)
+    def __start(self):
+        self.elems = self.elem = self.WD
+        self.IS = None
 
     # Service function Fill elems variables (self.elem, self.elems after operation with WebDriver
     def __fill_elems(self, data):
@@ -159,6 +158,7 @@ class Selen:
     # --------   Functions of findins, selecting elements -----------
     # The Wait chain function finds and waits for appear element and save elems variables
     def Wait(self, *args):
+        self.__start()
         args = self.__args_normalizer(args)
         # self.print("Waiting and Looking for :", args)
         try:
@@ -180,12 +180,13 @@ class Selen:
 
     # Find element(s) by arguments for all page elements and from WebDriver directly
     def Find(self, *args):
-        self.elems = self.elem = self.WD
+        self.__start()
         self.find(*args)
         return self
 
     # Find element(s) inside other element self.elem by arguments
     def find(self, *args):
+        self.IS = None
         args = self.__args_normalizer(args)
         print(args)
         for by in args:
@@ -226,7 +227,7 @@ class Selen:
 
     # Find element by tag name,  chain function for all page elements and from WebDriver directly
     def Tag(self, tag_name: str, *idx):
-        self.elems = self.elem = self.WD
+        self.__start()
         self.tag(tag_name, *idx)
         return self
 
@@ -237,7 +238,7 @@ class Selen:
 
     # Find element by Class name,  chain function for all page elements and from WebDriver directly
     def Cls(self, class_name: str, *idx):
-        self.elems = self.elem = self.WD
+        self.__start()
         self.cls(class_name, *idx)
         return self
 
@@ -246,9 +247,24 @@ class Selen:
         self.find((CLASS, class_name, *idx))
         return self
 
+        # Find element by Class name,  chain function for all page elements and from WebDriver directly
+    def Xpath(self, query: str, *idx):
+        self.__start()
+        self.cls(query, *idx)
+        return self
+
+        # Find element by tag name inside other elements in self.elems
+
+    def xpath(self, class_name: str, *idx):
+        self.find((CLASS, class_name, *idx))
+        return self
+
+    def Id(self, id_name: str, *idx):
+        self.Find(id_name, *idx)
+        
     # Get all image from all page from WebDriver object and optional checking and install
     def Img(self, check=False):
-        self.elems = self.elem = self.WD
+        self.__start()
         self.img(check=check)
         return self
 
@@ -258,7 +274,7 @@ class Selen:
         self.print("Found images:", len(self.elems))
         self.images = self.Out_dict({})
         for image in self.elems:
-            xpath = self.xpath(image)
+            xpath = self.xpath_query(image)
             src = image.get_attribute("src")
             alt = image.get_attribute("alt")
             visible = image.is_displayed()
@@ -293,6 +309,7 @@ class Selen:
 
     # Selecting Element filter by contain data(text and attributes) from all elements on Page from WD
     def Contains(self, data=None):
+        self.__start()
         self.__fill_elems(self.WD.find_elements(XPATH, "//*"))
         self.print("Count", len(self.elems))
 
@@ -330,6 +347,7 @@ class Selen:
 
     # Select parent element of self.elem, can use number of parent level, default = 1
     def parent(self, levels=1):
+        self.IS = None
         for i in range(levels):
             try:
                 self.__fill_elems(self.elem.find_element(By.XPATH, '..'))
@@ -374,10 +392,10 @@ class Selen:
         elem = self.elem if elem is None else elem
 
         if elem.is_displayed():
-            self.print("Element VISIBILITY already is ON, xpath:", self.xpath(elem))
+            self.print("Element VISIBILITY already is ON, xpath:", self.xpath_query(elem))
         else:
             self.WD.execute_script("arguments[0].style.display = 'block';", elem)
-            print("Element VISIBILITY switched ON, xpath:", self.xpath(elem))
+            print("Element VISIBILITY switched ON, xpath:", self.xpath_query(elem))
         return self
 
     # Text of element (self.elem) It has 2 mode text return or check if the text presents
@@ -401,7 +419,7 @@ class Selen:
         self.out_str = self.Out_str(self.elem.text)
         if text is None:
             return self.out_str
-        self.__checker(self.elem.text, text, f"Text {self.elem.text} at element: {self.xpath()}")
+        self.__checker(self.elem.text, text, f"Text {self.elem.text} at element: {self.xpath_query()}")
         return self
 
     # Type text in the element (self.elem)
@@ -423,7 +441,7 @@ class Selen:
         return self
 
     # Return absolute xpath of Element or None if not found
-    def xpath(self, elem=None) -> str or None:
+    def xpath_query(self, elem=None) -> str or None:
         elem = self.elem if elem is None else elem
         xpath = self.WD.execute_script("""
                 var xpath = "";
@@ -525,7 +543,7 @@ class Selen:
             if link.get_attribute('href'):
                 self.links.append(link.get_attribute('href'))
             else:
-                print(f"!!! Incorrect link: No attribute 'href', xpath: {self.xpath(link)}")
+                print(f"!!! Incorrect link: No attribute 'href', xpath: {self.xpath_query(link)}")
         self.links = list(set([link for link in self.links if not link.startswith("mailto:")]))
         self.print("Got ", len(self.links), "links, Saved to self.links variable")
         if check:
