@@ -10,9 +10,8 @@ this is a mini framework or an add-on for the selenium and unitest frameworks
 - error reduction
 
 
-# Quick stars and understanding
 
-## So, what can Selen do:
+## Quick start and what can Selen do:
 
 ### New find method and simplified adding locators as method arguments
 
