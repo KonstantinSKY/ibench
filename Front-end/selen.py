@@ -519,21 +519,6 @@ class Selen:
         # self.output = self.Output("False")
         return False
 
-    def invisibilaty(self):
-        pass
-
-    def is_title(self, title: str) -> bool:
-
-        return title == self.WD.title
-
-    def is_curr_url(self, url) -> bool:
-        return url == self.WD.current_url
-
-    def is_text(self, text) -> bool:
-        return text == self.elem.text
-
-    def is_attr(self, attr, value) -> bool:
-        return value == self.elem.get_attribute(attr)
 
     # --------- Links methods ------------------------------
     # Get all links from all page with WebDriver
