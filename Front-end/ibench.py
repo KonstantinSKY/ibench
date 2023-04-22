@@ -28,9 +28,9 @@ class iBench(Selen):
     def main_page(se):
         se.WD.get(se.url)  # Get page from WD
         # New Wait method
-        se.Wait(l_h1).text().out("TEST message:::::")
-        se.Wait(l_h1).text()
-        se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
+
+        se.Wait(l_h1).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?').out("h1:")
+        se.Tag("head").out("head:")
         se.Cls('FrontPage_clientImage__3KW8O').text().out("Image Page")
 
         se.Tag('h1', 0).text('Looking for a developers, UX/UI designer, QA or DevOps...or development agency?')
