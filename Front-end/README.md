@@ -190,7 +190,7 @@ This code does next steps:
 - check attribute `'class' = 'validation_status_ok'`
 
 ## Findind by locators and indexes of element in array of elements in `se.elems`
-sometimes we need to find a lot of elements then select one or more of them by index and continue searching inside it
+Sometimes we need to find a lot of elements then select one or more of them by index and continue searching inside it
 
 In Selenium: 
 ```python
@@ -211,16 +211,18 @@ se.Find((XPATH, "//xpath string...", 0, 3, 5, ...), (CLASS, Login_submit_wrapper
 ```
 So, the full rule of using `Find` and `find` is:
 
-`Find()`
-- this way is suitable and can be used in any search operator
+`Find(locator, [locators], [indexes])`
 
+`Find(locator, [locators], [indexes])`
 
+- this way is suitable and can be used in any finding operator
 
-
-## Method `Wait()` - finding and waiting for the appearance of an element on the page and not only
+## More ways to find and filter elements
+### Method `Wait()` - finding and waiting for the appearance of an element on the page and not only
 The method `Wait` can take the same parameters as the `Find` method, but it will only expect the first element in the chain and the rest of the elements in the chain will be found in the same way as the find method does.
 - No exception handling is required, the logic is already inside the White method
-It was like:
+
+In Selenium it was like:
 ```python
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -271,9 +273,6 @@ se.Wait((TAG, "a"), xpath_locators, locators)
 # ! Any combinations as You wish
 ```
 
-
-
-## More ways to find and filter elements
 ### Methods `Tag()` and `tag()` finding element(s) only by tag
 
     `Tag("tag name")`
