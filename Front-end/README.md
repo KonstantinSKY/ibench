@@ -308,13 +308,50 @@ se.Wait((TAG, "a"), xpath_locators, locators)
 
 `data` - can be text of WebElement (str) or attribute of WebElement (dict = '{"attribute name": "attribute value"}') 
 
-### Metods `Img()` and `img()` - finding elements containing a specific date
+### Metods `Img()` and `img()` - finding elements containing a images and pictures
     
     `Img([ index, index2, .., index n ][check=bool])` 
+- Find images inside All Page (WebDeiver). 
 
-    `img([ index, index2, .., index n ][check=bool])`
+    `img([ index, index2, .., index n ][check=bool])` 
+- find images inside the last found WebElement
 
-- By default `check = False`
+The method is used to save image information to an additional variable `se.images` as dictionary
+
+- By default `check=False`
+
+If set `check=True` the method checks the elements with the image for the presence of the source of the image, `alt` attribute, as well as its being loaded.
+Example:
+```python
+se.Img(check=True)
+
+# Result:
+"""
+Found images: 4
+Image: xpath: /html/body[1]/div[1]/div[1]/div[1]/div[1]/div[1]/header[1]/a[1]/img[1]
+ source: data:image/png;base64,iVBORw0KGgoAAAhQpUuTh8g+dO7jQI9xT/QAAAABJRU5ErkJggg==
+ alt = iBench - real-time developers Hiring
+ visible: True
+Checked  ... OK
+Image: xpath: /html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/img[1]
+ source: https://ibench.net/static/media/for-client.7fc250cc.webp
+ alt = Marketplace
+ visible: True
+Checked  ... OK
+Image: xpath: /html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[4]/div[2]/img[1]
+ source: https://ibench.net/static/media/for-company.4dd08eef.webp
+ alt = Marketplace
+ visible: True
+Checked  ... OK
+Image: xpath: /html/body[1]/div[2]/span[1]/img[1]
+ source: data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+ alt = 
+ visible: False
+!!! Invisible Image, xpath: /html/body[1]/div[2]/span[1]/img[1]
+!!! Image without ALT attribute, xpath: /html/body[1]/div[2]/span[1]/img[1]
+"""
+```
+
 
 ### `parents()` jump to the parent element by a different number of levels
     
@@ -419,7 +456,7 @@ This method checks if the element contains the specified attribute
 
 The content that this method displays on the screen depends on the method after which it is applied
 
-If `out()` follows a method that found and/or returns WebElement then out put will be context of WebElement
+If `out()` follows a method that found and/or returns WebElement then out put will be content of WebElement:
 ```python
 se.Cls('FrontPage_btnWrapper__2Q75S').out("Wrapper element:")
 # Result:
@@ -437,39 +474,38 @@ Wrapper element: WebElement
 """
 ```
 
-If `out()` follows a method that returns text then the output will be text
+If `out()` follows a method that returns text then the output will be text:
 ```python
 se.Tag('h1').text().out("Text of element:")
-#result
+# Result
 """
 Text of element: Looking for a developers, UX/UI designer, QA or DevOps...or development agency?
 """
 
 se.title().out("Page Title")
-#result:
+# Result:
 """
 Page title: iBench - real-time developers Hiring
 """
 
 se.curr_url().out("URL:")
-#result:
+# Result:
 """
 URL: https://ibench.net/
 """
 se.Tag('h1').xpath_query().out()
-#result:
+# Result:
 """
 /html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/h1[1]
 """
 ```
 
-If `out()` follows a method that returns dictionary then the output will be text
+If `out()` follows a method that returns dictionary then the output will be dictionary:
 ```python
 se.Img(1).images.out("Images statistic:")
+# Result:
 '''
-Result:
-
-Images statistic
+Images statistic:
 {
     "/html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/img[1]": {
         "source": "https://ibench.net/static/media/for-client.7fc250cc.webp",
