@@ -67,7 +67,7 @@ class iBench(Selen):
         se.parent(2).tag("span").attr('class', 'validation_status_ok')
 
         se.Find(*lc_submit_button).click()
-
+        # se.sleep(10)
         se.Wait(l_h1).text("Daily updates")
         se.curr_url("https://ibench.net/stats")
         se.title("Daily updates | iBench - real-time developers Hiring")
