@@ -11,6 +11,9 @@ class ChromeLoginTest(unittest.TestCase):
     def test_login(self):
         self.cls.login()
 
+    def test_main_page(self):
+        self.cls.main_page()
+
     def tearDown(self) -> None:
         self.cls.WD.close()
         self.cls = None
