@@ -83,14 +83,15 @@ class Selen:
         self.elems = []
         self.elem = WebElement
         self.wd_name = wd
-        self.out_str = ''
+
+        self.out_str = self.Out_str('')
+        self.stat = self.Out_dict({})
         # self.WD.maximize_window()
         self.AC = ActionChains(self.WD)
         self.WDW = WebDriverWait(self.WD, 10)
         self.url = ""
         self.ok_assert = True
         self.ok_print = True
-        self.stat = {}
         self.IS = None
 
     class Out_str(str):
@@ -112,6 +113,12 @@ class Selen:
         print(json.dumps(web_elem, indent=4))
         print(type(self.elem))
         return self
+
+    # Print text to STDOUT if it set
+    def print(self, *args, **kwargs):
+        if self.ok_print:
+            print(*args, **kwargs)
+
 
     def __get_hash(self, elem=None) -> str:
         if elem is None:
@@ -143,14 +150,6 @@ class Selen:
         for i in range(self.__get_tuple_depth(args) - 2):
             args = sum(args, ())
         return args
-
-    # Print text to STDOUT if it set
-    def print(self, *args, **kwargs):
-        if self.ok_print:
-            print(*args, **kwargs)
-
-    # def out(self, message=''):
-    #     print(message, self.output)
 
     # Run assertion if it set
     def assertion(self, message=''):
@@ -290,7 +289,7 @@ class Selen:
             src = elem.get_attribute("src")
             alt = elem.get_attribute("alt")
             visible = elem.is_displayed()
-            self.stat[e_hash] = {'xpath':xpath, 'source': src, 'alt': alt, 'visible': visible}
+            self.stat[e_hash] = {'xpath': xpath, 'source': src, 'alt': alt, 'visible': visible}
             self.print(f"Image: xpath: {xpath}\n source: {src}\n alt = {alt}\n visible: {visible}")
             # self.WD.execute_script("arguments[0].style.display = 'block';", image)
             if not check:
@@ -371,7 +370,7 @@ class Selen:
             try:
                 self.find(XPATH, '..')
             except NoSuchElementException:
-                self.assertion(f"Parent Element at level {i+1} not found")
+                self.assertion(f"Parent Element at level {i + 1} not found")
         return self
 
     # -------------- Functions for actions with found element(s) ----------------
@@ -485,12 +484,14 @@ class Selen:
         """, elem)  # Checking for correct XPATH
         try:
             self.WD.find_element(XPATH, xpath)
+            print("[Xpath", type(xpath))
             self.out_str = self.Out_str(xpath)
             return self.out_str
 
         except NoSuchElementException:
             self.assertion(f"!!! Found Incorrect abs XPATH, Got {xpath} but Can not to find Element by it")
-            return None
+
+        return self
 
     # Check attribute of self.elem, if exists,  for value, if value is None returns value
     def attr(self, attr, value=None):
@@ -536,9 +537,9 @@ class Selen:
 
     # --------- Links methods ------------------------------
     # Get all links from self.elem  page with WebDriver
-    def check_links(self,  asynchron=True):
+    def check_links(self, asynchron=True):
         self.__start()
-        self.stat = self.Out_dict({}) 
+        self.stat = self.Out_dict({})
         self.tag('a')
         link_hashes = []
         for elem in self.elems:
@@ -580,7 +581,7 @@ class Selen:
             except:
                 stat['response_url'] = "Exception: Unable to reach"
                 stat['code'] = None
-        
+
         self.__summary_stat()
 
     # Links response async checking

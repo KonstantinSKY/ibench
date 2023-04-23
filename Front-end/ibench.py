@@ -62,7 +62,7 @@ class iBench(Selen):
 
         se.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).out()
         se.parent(2).tag("span").attr('class', 'validation_status_ok')
-
+        se.Find(NAME, "email").xpath_query().out("XPath")
         se.Find(NAME, "password").type(PASSW).sleep(0.2).attr('value', PASSW)
         se.parent(2).tag("span").attr('class', 'validation_status_ok')
 
