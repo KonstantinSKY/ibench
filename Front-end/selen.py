@@ -380,7 +380,7 @@ class Selen:
             self.__action_click(pause=pause)
         else:
             self.elem.click()
-        self.print("Clicked element:", self.elem)
+        self.print("Clicked element:", self.xpath_query(self.elem))
         return self
 
     # Context Click chain function with pause.
@@ -420,7 +420,7 @@ class Selen:
     def title(self, title=''):
         self.out_str = self.Out_str(self.WD.title)
         if title:
-            self.IS = self.__checker(self.WD.title, title, f"Title at: {self.WD.current_url}")
+            self.IS = self.__checker(self.WD.title, title, f'Title at the page: "{self.WD.current_url}"')
             return self
         return self.out_str
 
@@ -437,7 +437,7 @@ class Selen:
         self.out_str = self.Out_str(self.elem.text)
         if text is None:
             return self.out_str
-        self.__checker(self.elem.text, text, f"Text {self.elem.text} at element: {self.xpath_query()}")
+        self.__checker(self.elem.text, text, f'Text "{self.elem.text}" at element: "{self.xpath_query()}"')
         return self
 
     # Type text in the element (self.elem)
@@ -484,7 +484,6 @@ class Selen:
         """, elem)  # Checking for correct XPATH
         try:
             self.WD.find_element(XPATH, xpath)
-            print("[Xpath", type(xpath))
             self.out_str = self.Out_str(xpath)
             return self.out_str
 
