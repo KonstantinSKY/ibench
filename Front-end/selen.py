@@ -110,6 +110,8 @@ class Selen:
                     "visible": self.elem.is_displayed(),
                     "attributes": self.all_attrs()}
         print(json.dumps(web_elem, indent=4))
+        print(type(self.elem))
+        return self
 
     def __get_hash(self, elem=None) -> str:
         if elem is None:
@@ -201,9 +203,8 @@ class Selen:
     def find(self, *args):
         self.IS = None
         args = self.__args_normalizer(args)
-        print(args)
-        for by in args:
-            self.__find_one(*by)
+        for arg in args:
+            self.__find_one(*arg)
 
         return self
 
@@ -213,7 +214,6 @@ class Selen:
             self.assertion(f"Previous element = {self.elem}. Cant to find next {args} element")
             return
             # trying to find element
-        print("args", args)
         try:
             elems = self.elem.find_elements(*args[:2])
         except NoSuchElementException:
@@ -229,13 +229,9 @@ class Selen:
                     print("Wrong index of elements", arg, "maximum is", len(elems))
             elems = new_elems
 
-        self.elems = elems
-        if self.elems:
-            self.elem = self.elems[0]
-            return
-
-        self.elem = None
-        self.assertion(f"Element(s) not found: {args}, elems: {self.elems}, elem: {self.elem}")
+        self.__fill_elems(elems)
+        if self.elem is None:
+            self.assertion(f"Element(s) not found: {args}, elems: {self.elems}, elem: {self.elem}")
         return
 
     # Find element by tag name,  chain function for all page elements and from WebDriver directly
@@ -287,12 +283,14 @@ class Selen:
         self.tag('img', *idxs)
         self.print("Found images:", len(self.elems))
         self.stat = self.Out_dict({})
-        for image in self.elems:
-            xpath = self.xpath_query(image)
-            src = image.get_attribute("src")
-            alt = image.get_attribute("alt")
-            visible = image.is_displayed()
-            self.stat[xpath] = {'source': src, 'alt': alt, 'visible': visible}
+
+        for elem in self.elems:
+            e_hash = self.__get_hash(self.elem)
+            xpath = self.xpath_query(elem)
+            src = elem.get_attribute("src")
+            alt = elem.get_attribute("alt")
+            visible = elem.is_displayed()
+            self.stat[e_hash] = {'xpath':xpath, 'source': src, 'alt': alt, 'visible': visible}
             self.print(f"Image: xpath: {xpath}\n source: {src}\n alt = {alt}\n visible: {visible}")
             # self.WD.execute_script("arguments[0].style.display = 'block';", image)
             if not check:
@@ -308,14 +306,14 @@ class Selen:
                 ok = False
                 print(f"!!! Image without ALT attribute, xpath: {xpath}")
             # checked if loaded
-            complete = self.WD.execute_script("return arguments[0].complete", image)
-            n_width = self.WD.execute_script("return arguments[0].naturalWidth > 0", image)
+            complete = self.WD.execute_script("return arguments[0].complete", elem)
+            n_width = self.WD.execute_script("return arguments[0].naturalWidth > 0", elem)
             if not complete or not n_width:
                 ok = False
                 print(f"!!! Image not loaded, xpath:{xpath}. Arguments: Complete={complete}, naturalWidth={n_width}")
-                self.stat[xpath]['loaded'] = False
+                self.stat[e_hash]['loaded'] = False
             else:
-                self.stat[xpath]['loaded'] = True
+                self.stat[e_hash]['loaded'] = True
             if ok:
                 print("Checked  ... OK")
         self.print("Got images:", len(self.stat))
@@ -328,6 +326,7 @@ class Selen:
         self.print("Count", len(self.elems))
 
         self.contains(data, *idxs)
+        return self
 
     # Selecting Element filter by contain data(text and attributes) from other element self.elem
     def contains(self, data, *idxs):
@@ -370,9 +369,9 @@ class Selen:
         self.IS = None
         for i in range(levels):
             try:
-                self.__fill_elems(self.find(XPATH, '..'))
+                self.find(XPATH, '..')
             except NoSuchElementException:
-                self.assertion(f"Parent Element at level {i} not found")
+                self.assertion(f"Parent Element at level {i+1} not found")
         return self
 
     # -------------- Functions for actions with found element(s) ----------------
@@ -505,7 +504,8 @@ class Selen:
         if value is None:
             return real_value
 
-        self.__checker(real_value, value, f"Attribute: {attr} with value: {value} for elements: {self.elem}")
+        self.__checker(real_value, value, f"Attribute: {attr} with value: {value} "
+                                          f"for elements: {self.xpath_query(self.elem)}")
         return self
 
     # return all attributes of element
@@ -535,12 +535,6 @@ class Selen:
         return False
 
     # --------- Links methods ------------------------------
-    # Get all links from all page with WebDriver
-    # def Get_links(self, extract=False, check=False, asynchron=True):
-    #     self.elems = self.elem = self.WD
-    #     self.get_links(extract, check, asynchron=asynchron)
-    #     return self.links if extract else self
-
     # Get all links from self.elem  page with WebDriver
     def check_links(self,  asynchron=True):
         self.__start()
@@ -624,9 +618,6 @@ class Selen:
             self.assertion(f"Broken link found: {stat['href']}")
         elif code is None:
             self.assertion(f"Unable to reach:{stat['href']} in xpath element:{stat['xpath']}")
-             # rint(f"Unable to reach: {url}")
-        # print("final status", len(self.stat))
-        # print(self.links)
 
     # --------- Image Methods ---------------------------
 
