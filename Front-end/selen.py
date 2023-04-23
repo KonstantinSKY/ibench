@@ -1,4 +1,5 @@
 import json
+import hashlib
 import time
 from random import uniform
 from collections import Counter
@@ -81,8 +82,6 @@ class Selen:
 
         self.elems = []
         self.elem = WebElement
-        self.links = []
-        self.images = {}
         self.wd_name = wd
         self.out_str = ''
         self.WD.maximize_window()
@@ -111,6 +110,11 @@ class Selen:
                     "visible": self.elem.is_displayed(),
                     "attributes": self.all_attrs()}
         print(json.dumps(web_elem, indent=4))
+
+    def __get_hash(self, elem=None) -> str:
+        if elem is None:
+            elem = self.elem
+        return hashlib.md5(elem.get_attribute("outerHTML").encode()).hexdigest()
 
     def __start(self):
         self.elems = self.elem = self.WD
@@ -235,60 +239,60 @@ class Selen:
         return
 
     # Find element by tag name,  chain function for all page elements and from WebDriver directly
-    def Tag(self, tag_name: str, *idx):
+    def Tag(self, tag_name: str, *idxs):
         self.__start()
-        self.tag(tag_name, *idx)
+        self.tag(tag_name, *idxs)
         return self
 
     # Find element by tag name inside other elements in self.elems
-    def tag(self, tag_name: str, *idx):
-        self.find((TAG, tag_name, *idx))
+    def tag(self, tag_name: str, *idxs):
+        self.find((TAG, tag_name, *idxs))
         return self
 
     # Find element by Class name,  chain function for all page elements and from WebDriver directly
-    def Cls(self, class_name: str, *idx):
+    def Cls(self, class_name: str, *idxs):
         self.__start()
-        self.cls(class_name, *idx)
+        self.cls(class_name, *idxs)
         return self
 
     # Find element by tag name inside other elements in self.elems
-    def cls(self, class_name: str, *idx):
-        self.find((CLASS, class_name, *idx))
+    def cls(self, class_name: str, *idxs):
+        self.find((CLASS, class_name, *idxs))
         return self
 
         # Find element by Class name,  chain function for all page elements and from WebDriver directly
 
-    def Xpath(self, query: str, *idx):
+    def Xpath(self, query: str, *idxs):
         self.__start()
-        self.cls(query, *idx)
+        self.cls(query, *idxs)
         return self
 
         # Find element by tag name inside other elements in self.elems
 
-    def xpath(self, class_name: str, *idx):
-        self.find((CLASS, class_name, *idx))
+    def xpath(self, class_name: str, *idxs):
+        self.find((CLASS, class_name, *idxs))
         return self
 
-    def Id(self, id_name: str, *idx):
-        self.Find(id_name, *idx)
+    def Id(self, id_name: str, *idxs):
+        self.Find(id_name, *idxs)
 
     # Get all image from all page from WebDriver object and optional checking and install
-    def Img(self, *idx, check=False):
+    def Img(self, *idxs, check=False):
         self.__start()
-        self.img(*idx, check=check)
+        self.img(*idxs, check=check)
         return self
 
     # Get all image from element self.elem and optional checking and extract
-    def img(self, *idx, check=False):
-        self.tag('img', *idx)
+    def img(self, *idxs, check=False):
+        self.tag('img', *idxs)
         self.print("Found images:", len(self.elems))
-        self.images = self.Out_dict({})
+        self.stat = self.Out_dict({})
         for image in self.elems:
             xpath = self.xpath_query(image)
             src = image.get_attribute("src")
             alt = image.get_attribute("alt")
             visible = image.is_displayed()
-            self.images[xpath] = {'source': src, 'alt': alt, 'visible': visible}
+            self.stat[xpath] = {'source': src, 'alt': alt, 'visible': visible}
             self.print(f"Image: xpath: {xpath}\n source: {src}\n alt = {alt}\n visible: {visible}")
             # self.WD.execute_script("arguments[0].style.display = 'block';", image)
             if not check:
@@ -309,12 +313,12 @@ class Selen:
             if not complete or not n_width:
                 ok = False
                 print(f"!!! Image not loaded, xpath:{xpath}. Arguments: Complete={complete}, naturalWidth={n_width}")
-                self.images[xpath]['loaded'] = False
+                self.stat[xpath]['loaded'] = False
             else:
-                self.images[xpath]['loaded'] = True
+                self.stat[xpath]['loaded'] = True
             if ok:
                 print("Checked  ... OK")
-        self.print("Got images:", len(self.images))
+        self.print("Got images:", len(self.stat))
         return self
 
     # Selecting Element filter by contain data(text and attributes) from all elements on Page from WD
@@ -333,7 +337,7 @@ class Selen:
                 result = False
                 print("elem", self.elem)
                 for attr, value in data.items():
-                    if not self.is_attr(attr, value):
+                    if not self.attr(attr, value).IS:
                         result = False
                         print("attr", attr, "not found")
                         break
@@ -530,80 +534,99 @@ class Selen:
         # self.output = self.Output("False")
         return False
 
-
     # --------- Links methods ------------------------------
     # Get all links from all page with WebDriver
-    def Get_links(self, extract=False, check=False, asynchron=True):
-        self.elems = self.elem = self.WD
-        self.get_links(extract, check, asynchron=asynchron)
-        return self.links if extract else self
+    # def Get_links(self, extract=False, check=False, asynchron=True):
+    #     self.elems = self.elem = self.WD
+    #     self.get_links(extract, check, asynchron=asynchron)
+    #     return self.links if extract else self
 
     # Get all links from self.elem  page with WebDriver
-    def get_links(self, extract=False, check=False, asynchron=True):
-        self.links = []
+    def check_links(self,  asynchron=True):
+        self.__start()
+        self.stat = self.Out_dict({}) 
         self.tag('a')
-        for link in self.elems:
-            if link.get_attribute('href'):
-                self.links.append(link.get_attribute('href'))
-            else:
-                print(f"!!! Incorrect link: No attribute 'href', xpath: {self.xpath_query(link)}")
-        self.links = list(set([link for link in self.links if not link.startswith("mailto:")]))
-        self.print("Got ", len(self.links), "links, Saved to self.links variable")
-        if check:
-            self.check_links(asynchron=asynchron)
-        return self.links if extract else self
+        link_hashes = []
+        for elem in self.elems:
+            e_hash = self.__get_hash(elem)
+            stat = self.stat[e_hash] = {'xpath': self.xpath_query(elem)}
+            href = elem.get_attribute('href')
+            if not href:
+                stat['href'] = None
+                self.assertion(f"!!! No Link: No attribute 'href', xpath: {stat['xpath']}")
+                continue
+            elif href.startswith("mailto"):
+                stat['href'] = href
+                self.print(f"!!! Found Email link {href}, xpath: {stat['xpath']}")
+                continue
 
-    # Check links for response 200, selecting of mode sync or async
-    def check_links(self, asynchron=True):
+            stat['href'] = href
+            link_hashes.append(e_hash)
+            elem.get_attribute('href')
+
+        self.print("Got ", len(link_hashes))
         if asynchron:
             self.print('Async link checking...')
-            asyncio.run(self.__check_links_async())
+            asyncio.run(self.__check_links_async(link_hashes))
         else:
             self.print('Sync links checking...')
-            self.__check_links_sync()
+            self.__check_links_sync(link_hashes)
+
+        return self
 
     # Links response sync checking
-    def __check_links_sync(self):
-        self.stat = {}
-        for link in self.links:
+    def __check_links_sync(self, link_hashes):
+        for e_hash in link_hashes:
+            stat = self.stat[e_hash]
             try:
-                response = requests.get(link)
-                self.__response_stat(link, response.status_code)
+                response = requests.get(stat['href'])
+                stat['response_url'] = str(response.url)
+                stat['code'] = response.status_code
+                self.__response_stat(e_hash)
             except:
-                print("Unable to reach:", link)
+                stat['response_url'] = "Exception: Unable to reach"
+                stat['code'] = None
+        
         self.__summary_stat()
 
     # Links response async checking
-    async def __check_links_async(self):
+    async def __check_links_async(self, link_hashes):
         async with aiohttp.ClientSession() as session:
             tasks = []
-            for link in self.links:
-                task = asyncio.create_task(self.__check_link_async(link, session))
+            for e_hash in link_hashes:
+                task = asyncio.create_task(self.__check_link_async(e_hash, session))
                 tasks.append(task)
             responses = await asyncio.gather(*tasks)
-            self.stat = {}
+
             for response in responses:
-                self.__response_stat(response.url, response.status)
+                self.stat[response.e_hash]['response_url'] = str(response.url)
+                self.stat[response.e_hash]['code'] = response.status
+                self.__response_stat(response.e_hash)
+
             self.__summary_stat()
 
-    async def __check_link_async(self, link, session):
-        async with session.get(link) as response:
+    async def __check_link_async(self, e_hash, session):
+        async with session.get(self.stat[e_hash]['href']) as response:
+            response.e_hash = e_hash
             return response
 
     def __summary_stat(self):
-        counts = Counter(self.stat.values())
-        self.print("Checked:", len(self.links), ", Status 200 OK is", counts[200])
-        self.print("All statuses:", self.stat)
+        code_counts = Counter(value.get('code') for value in self.stat.values())
+        self.print("Checked:", len(self.stat), ", Status 200 OK is", code_counts[200])
+        print("ALL ", len(self.stat))
 
-    def __response_stat(self, url, status):
-        self.stat[url] = status
-        print(len(self.stat))
-        if status == 200:
-            self.print(url, "OK")
-        elif status == 404:
-            self.assertion(f"Broken link found: {url}")
-        else:
-            print(f"Unable to reach: {url}")
+    def __response_stat(self, e_hash):
+        stat = self.stat[e_hash]
+        code = stat['code']
+        if code == 200:
+            self.print(f"Checked  {stat['href']}... OK")
+        elif code == 404:
+            self.assertion(f"Broken link found: {stat['href']}")
+        elif code is None:
+            self.assertion(f"Unable to reach:{stat['href']} in xpath element:{stat['xpath']}")
+             # rint(f"Unable to reach: {url}")
+        # print("final status", len(self.stat))
+        # print(self.links)
 
     # --------- Image Methods ---------------------------
 
