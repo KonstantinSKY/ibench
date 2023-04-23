@@ -13,7 +13,7 @@ class iBench(Selen):
         super().__init__(wd)
         # Web-site and tests environment settings
         se.url = "https://ibench.net/"
-        se.ok_assertions = False
+        se.ok_assert = False
         se.ok_print = True
 
     # locators
@@ -56,7 +56,7 @@ class iBench(Selen):
 
         se.main_page()
         se.Contains("Log in").click()
-        se.Wait(l_h2).text("Log in").click()
+        se.Wait(l_h2).text("Login").click()
 
         se.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
 
