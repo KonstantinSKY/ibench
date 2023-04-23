@@ -45,7 +45,7 @@ class iBench(Selen):
 
         se.curr_url().out("URL:")  # Output URL
         se.curr_url("https://ibench.net/")  # Check url
-        # se.check_links(asynchron=True).stat.out("Link Statistic")
+        # se.check_links(asynchron=False).stat.out("Link Statistic")
 
         # Checking images on the page
         # se.Img(check=True).sleep(10)  # Check all Images
