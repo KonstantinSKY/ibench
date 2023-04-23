@@ -316,7 +316,7 @@ se.Wait((TAG, "a"), xpath_locators, locators)
     `img([ index, index2, .., index n ][check=bool])` 
 - find images inside the last found WebElement
 
-The method is used to save image information to an additional variable `se.images` as dictionary
+The method is used to save image information to an inner variable `se.stat` as dictionary
 
 - By default `check=False`
 
@@ -335,7 +335,7 @@ Image: xpath: /html/body[1]/div[1]/div[1]/div[1]/div[1]/div[1]/header[1]/a[1]/im
 Checked  ... OK
 Image: xpath: /html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/img[1]
  source: https://ibench.net/static/media/for-client.7fc250cc.webp
- alt = Marketplace
+ alt = Marketplace``
  visible: True
 Checked  ... OK
 Image: xpath: /html/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[4]/div[2]/img[1]
