@@ -13,7 +13,7 @@ class iBench(Selen):
         super().__init__(wd)
         # Web-site and tests environment settings
         se.url = "https://ibench.net/"
-        se.ok_assertions = False
+        se.ok_assert = False
         se.ok_print = True
 
     # locators
@@ -45,7 +45,11 @@ class iBench(Selen):
 
         se.curr_url().out("URL:")  # Output URL
         se.curr_url("https://ibench.net/")  # Check url
-        se.check_links(asynchron=True)
+<<<<<<< HEAD
+        # se.check_links(asynchron=True)
+=======
+        # se.check_links(asynchron=False).stat.out("Link Statistic")
+>>>>>>> cce5c6de178f0b4265858631baa65e2e90eed5fd
 
         # Checking images on the page
         # se.Img(check=True).sleep(10)  # Check all Images
@@ -56,13 +60,18 @@ class iBench(Selen):
 
         se.main_page()
         se.Contains("Log in").click()
-        se.Wait(l_h2).text("Log in")
-        se.Img(check=True)
+<<<<<<< HEAD
+        #se.Wait(l_h2).text("Log in")
+        #se.Img(check=True)
+=======
+        #se.Wait(l_h2).text("Login").click()
+
+>>>>>>> cce5c6de178f0b4265858631baa65e2e90eed5fd
         se.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
 
         se.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).out()
         se.parent(2).tag("span").attr('class', 'validation_status_ok')
-
+        se.Find(NAME, "email").xpath_query().out("XPath")
         se.Find(NAME, "password").type(PASSW).sleep(0.2).attr('value', PASSW)
         se.parent(2).tag("span").attr('class', 'validation_status_ok')
 
