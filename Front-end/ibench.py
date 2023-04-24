@@ -45,7 +45,7 @@ class iBench(Selen):
 
         se.curr_url().out("URL:")  # Output URL
         se.curr_url("https://ibench.net/")  # Check url
-        # se.check_links(asynchron=True).stat.out("Link Statistic")
+        se.check_links(asynchron=True)
 
         # Checking images on the page
         # se.Img(check=True).sleep(10)  # Check all Images
@@ -57,7 +57,7 @@ class iBench(Selen):
         se.main_page()
         se.Contains("Log in").click()
         se.Wait(l_h2).text("Log in")
-
+        se.Img(check=True)
         se.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
 
         se.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).out()
@@ -72,6 +72,8 @@ class iBench(Selen):
         se.curr_url("https://ibench.net/stats")
         se.title("Daily updates | iBench - real-time developers Hiring")
         sleep(10)
+
+
 
     def login_cookies(self):
         self.add_cookies()
