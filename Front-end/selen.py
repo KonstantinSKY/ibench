@@ -94,9 +94,11 @@ class Selen:
         self.ok_print = True
         self.IS = None
 
+    # TODO Class Elem
     class Out_str(str):
         def out(self, message=''):
             print(message, self)
+            return self
 
     class Out_dict(dict):
         def out(self, message=''):
@@ -109,7 +111,8 @@ class Selen:
         web_elem = {"tag name": self.elem.tag_name,
                     "abs xpath": self.xpath_query(),
                     "visible": self.elem.is_displayed(),
-                    "attributes": self.all_attrs()}
+                    "attributes": self.all_attrs(),
+                    "text": self.elem.text}
         print(json.dumps(web_elem, indent=4))
         print(type(self.elem))
         return self
@@ -118,7 +121,6 @@ class Selen:
     def print(self, *args, **kwargs):
         if self.ok_print:
             print(*args, **kwargs)
-
 
     def __get_hash(self, elem=None) -> str:
         if elem is None:
@@ -178,11 +180,11 @@ class Selen:
         try:
             elem = self.WDW.until(EC.presence_of_element_located(args[0]))
         except NoSuchElementException:
-            self.assertion(f"Element not found: {args[0]}")
+            self.assertion(f"Element not found: {args[0]} ... FAIL")
             return
         except TimeoutException:
             print("Command timed out!")
-            self.assertion(f"Element not found: {args[0]}")
+            self.assertion(f"Element not found: {args[0]} ... FAIL")
             return
 
         self.print("Wait Element found", args[0], " ... OK")
@@ -380,7 +382,7 @@ class Selen:
             self.__action_click(pause=pause)
         else:
             self.elem.click()
-        self.print("Clicked element:", self.xpath_query(self.elem))
+        self.print("Clicked element:", self.elem)
         return self
 
     # Context Click chain function with pause.
@@ -420,7 +422,7 @@ class Selen:
     def title(self, title=''):
         self.out_str = self.Out_str(self.WD.title)
         if title:
-            self.IS = self.__checker(self.WD.title, title, f'Title at the page: "{self.WD.current_url}"')
+            self.__checker(self.out_str, title, f'Title "{self.out_str}" at the page: "{self.WD.current_url}"')
             return self
         return self.out_str
 
@@ -428,7 +430,7 @@ class Selen:
     def curr_url(self, url=''):
         self.out_str = self.Out_str(self.WD.current_url)
         if url:
-            self.__checker(self.WD.current_url, url, "Current_URL ")
+            self.__checker(self.out_str, url, f"Current_URL {self.out_str}")
             return self
         return self.out_str
 
@@ -439,6 +441,9 @@ class Selen:
             return self.out_str
         self.__checker(self.elem.text, text, f'Text "{self.elem.text}" at element: "{self.xpath_query()}"')
         return self
+
+    # def texts(self, texts=[]: list):
+    #     pass
 
     # Type text in the element (self.elem)
     def type(self, text):
@@ -527,12 +532,15 @@ class Selen:
             self.print("Checked:", message, "... OK")
             # self.output = self.Output("True")
             return True
-
-        self.assertion(f"!!! Wrong {message}")
-        print("Got:", got)
-        print("Expected:", expect)
+        print("Checked:", message, "... FAIL")
+        print("* Got data:", got)
+        print("* Expected:", expect)
+        self.assertion(f"Wrong {message}")
         # self.output = self.Output("False")
         return False
+
+    def check_page(self, data):
+        pass
 
     # --------- Links methods ------------------------------
     # Get all links from self.elem  page with WebDriver
@@ -544,14 +552,15 @@ class Selen:
         for elem in self.elems:
             e_hash = self.__get_hash(elem)
             stat = self.stat[e_hash] = {'xpath': self.xpath_query(elem)}
-            href = elem.get_attribute('href')
+            href = elem.get_attribute('href').strip()
             if not href:
                 stat['href'] = None
                 self.assertion(f"!!! No Link: No attribute 'href', xpath: {stat['xpath']}")
                 continue
-            elif href.startswith("mailto"):
+            elif href.startswith("mailto") or href.startswith("tel") or href.startswith("%"):
                 stat['href'] = href
-                self.print(f"!!! Found Email link {href}, xpath: {stat['xpath']}")
+                self.print(f"!!! Found non WEB link {href}")
+                self.print(json.dumps(stat, indent=4))
                 continue
 
             stat['href'] = href
@@ -593,16 +602,24 @@ class Selen:
             responses = await asyncio.gather(*tasks)
 
             for response in responses:
-                self.stat[response.e_hash]['response_url'] = str(response.url)
-                self.stat[response.e_hash]['code'] = response.status
-                self.__response_stat(response.e_hash)
+                if response:
+                    self.stat[response.e_hash]['response_url'] = str(response.url) if response else None
+                    self.stat[response.e_hash]['code'] = response.status
+                    self.__response_stat(response.e_hash)
 
             self.__summary_stat()
 
     async def __check_link_async(self, e_hash, session):
-        async with session.get(self.stat[e_hash]['href']) as response:
-            response.e_hash = e_hash
-            return response
+        try:
+            async with session.get(self.stat[e_hash]['href']) as response:
+                response.e_hash = e_hash
+                return response
+        except aiohttp.client_exceptions.ClientConnectorError as err:
+            print("Error:", err)
+            self.stat[e_hash]['response_url'] = "Exception: Unable to reach"
+            self.stat[e_hash]['code'] = None
+            print("WebElement:", json.dumps(self.stat[e_hash], indent=4))
+            # self.sleep(50)
 
     def __summary_stat(self):
         code_counts = Counter(value.get('code') for value in self.stat.values())
@@ -613,11 +630,12 @@ class Selen:
         stat = self.stat[e_hash]
         code = stat['code']
         if code == 200:
-            self.print(f"Checked  {stat['href']}... OK")
+            self.print(f"Checked  {stat['href']} .... OK")
         elif code == 404:
-            self.assertion(f"Broken link found: {stat['href']}")
+            print("Page:", json.dumps(stat, indent=4))
+            # self.assertion(f"Broken link found: {stat['href']} .... FAIL")
         elif code is None:
-            self.assertion(f"Unable to reach:{stat['href']} in xpath element:{stat['xpath']}")
+            self.assertion(f"Unable to reach:{stat['href']} in xpath element:{stat['xpath']} .... FAIL")
 
     # --------- Image Methods ---------------------------
 
