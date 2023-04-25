@@ -11,10 +11,10 @@ class ChromeLoginTest(unittest.TestCase):
     def test_login(self):
         self.cls.login()
 
-    def test_main_page(self):
-        self.cls.main_page()
+    def test_home_page(self):
+        self.cls.home()
 
-    def test_header_manu(self):
+    def test_header_menu(self):
         self.cls.head_nav_menu()
 
     def test_footer_menu(self):
