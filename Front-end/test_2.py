@@ -14,6 +14,12 @@ class ChromeLoginTest(unittest.TestCase):
     def test_main_page(self):
         self.cls.main_page()
 
+    def test_header_manu(self):
+        self.cls.head_nav_menu()
+
+    def test_footer_menu(self):
+        self.cls.foot_nav_menu()
+
     def tearDown(self) -> None:
         self.cls.WD.close()
         self.cls = None
