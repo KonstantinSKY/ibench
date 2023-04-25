@@ -66,7 +66,7 @@ class Selen:
         elif wd == "Edge":
             opts = webdriver.EdgeOptions()
             opts.use_chromium = True
-            # opts.binary_location = '/opt/microsoft/msedge/msedge'
+            opts.binary_location = '/opt/microsoft/msedge/msedge'
             opts.add_argument('--start-maximized')
             self.WD = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=opts)
 
