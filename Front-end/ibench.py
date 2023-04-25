@@ -13,7 +13,7 @@ class iBench(Selen):
         super().__init__(wd)
         # Web-site and tests environment settings
         se.url = "https://ibench.net/"
-        se.ok_assert = False
+        se.ok_assert = True
         se.ok_print = True
 
     # locators
@@ -66,7 +66,7 @@ class iBench(Selen):
         se.Wait(l_h1).text("Daily updates")
         se.curr_url("https://ibench.net/stats").title("Daily updates | iBench - real-time developers Hiring")
         se.Img(check=True).check_links()
-        sleep(10)
+        # sleep(10)
 
         # se.Find(NAME, "email").xpath_query().out("XPath")
         # se.Wait(l_h2).text("Log in")
@@ -74,42 +74,61 @@ class iBench(Selen):
         # se.Wait(l_h2).text("Login").click()
 
     def about(se):
-        se.Wait(l_h1).text("""iBench is an easy hiring way to find new highly-skilled 
-                              Remote developers in 2-3 business days after your request.)""")
+        se.Wait(l_h1).text(
+            """iBench is an easy hiring way to find new highly-skilled Remote developers in 2-3 business days after your request.""")
         se.curr_url('https://ibench.net/about').title('About | iBench - real-time developers Hiring')
         se.Img(check=True).check_links()
 
-    def hire_remote_team(se):
-        se.Wait(l_h1).text('About | iBench - real-time developers Hiring')
-        se.curr_url('https://ibench.net/team-search').title('About | iBench - real-time developers Hiring')
+    def blog(se):
+        se.Wait(CLASS, "breadcrumbs").Tag("span", 1).text("Blog")
+        se.curr_url('https://ibench.net/blog/').title('iBench - iBench - real-time developers Hiring')
         se.Img(check=True).check_links()
 
-        page_data = {'about': {'curr_url': 'https://ibench.net/about',
-                               'title': 'About | iBench - real-time developers Hiring',
-                               'locator': """(l_h1).text(iBench is an easy hiring way to find new highly-skilled 
-                                              Remote developers in 2-3 business days after your request.)"""
-                               },
-                     'Hire remote team': {
-                                'curr_url': 'https://ibench.net/team-search',
-                                # 'title': 'team-search | iBench - real-time developers Hiring',
-                                'title': 'About | iBench - real-time developers Hiring',
-                                'locator': '(l_h1).text("Hire remote developers team")'
-                                },
-                     # 'Blog': {
-                     #     'curr_url': 'https://ibench.net/team-search',
-                     #     # 'title': 'team-search | iBench - real-time developers Hiring',
-                     #     'title': 'About | iBench - real-time developers Hiring',
-                     #     'h1_text': "Hire remote developers team"
-                     # },
-                     # 'Home': {
-                     #     'curr_url': 'https://ibench.net/',
-                     #     # 'title': 'team-search | iBench - real-time developers Hiring',
-                     #     'title': 'About | iBench - real-time developers Hiring',
-                     #     'h1_text': "Hire remote developers team"
-                     # },
+    def hire_remote_team(se):
+        se.Wait(l_h1).text('Hire remote developers team')
+        se.title().out("Title :")
+        se.title("iBench - real-time developers Hiring")
+        se.curr_url('https://ibench.net/team-search')  # .title('About | iBench - real-time developers Hiring')
+        se.Img(check=True).check_links()
 
-                     }
-        for elem in page_data:
+    def support_slack(se):
+        se.Wait(CLASS, 'c-link').img().attr("alt", "Slack")
+
+    def privacy(se):
+        se.Wait(l_h1).text('Privacy Notice')
+        se.curr_url('https://ibench.net/privacy-policy').title('Privacy Notice | iBench - real-time developers Hiring')
+        se.Img(check=True).check_links()
+
+    def cookie(se):
+        se.Wait(l_h1).text('Cookie Policy')
+        se.curr_url('https://ibench.net/cookie-policy').title('Cookie Policy | iBench - real-time developers Hiring')
+        se.Img(check=True).check_links()
+
+    def terms(se):
+        se.Wait(l_h1).text('Terms Of Use')
+        se.curr_url('https://ibench.net/terms-of-use').title('Terms Of Use | iBench - real-time developers Hiring')
+        se.Img(check=True).check_links()
+
+    def nav_menu(se):
+        for se.elem in se.elems:
+            func = se.elem.text.lower().replace(" ", "_")
+            if se.url == se.elem.get_attribute('href'):
+                continue
+            print("Checking menu element... ", func)
+            se.click()
+            eval(f"se.{func}()")
+            se.WD.back()
+
+    def head_nav_menu(se):
+        se.WD.get(se.url)  # Get page from WD
+        se.Wait(CLASS, 'Navigation_menu__Xg4DA').tag('a')
+        se.nav_menu()
+
+    def foot_nav_menu(se):
+        se.WD.get(se.url)  # Get page from WD
+        se.Wait(CLASS, "cookieinfo-close").click()
+        se.Cls('Footer_menu__3wGBS').tag('a')
+        se.nav_menu()
 
     def login_cookies(self):
         self.add_cookies()
@@ -128,5 +147,8 @@ class iBench(Selen):
 
 
 if __name__ == "__main__":
-    iBench().login()
+    iBench().foot_nav_menu()
+    # iBench().head_nav_menu()
+    # iBench().login()
+    print('FINISHED')
     sleep(10)
