@@ -32,7 +32,7 @@ class iBench(Selen):
         se.title('iBench - real-time developers Hiring')  # Check title
         se.curr_url("https://ibench.net/")  # Check url
         se.Img(check=True).stat.out()  # Check all Images
-        se.check_links(asynchron=True).sleep(0, 3)  # Check all Links
+        # se.check_links(asynchron=True).sleep(0, 3)  # Check all Links
 
         # se.Tag("head").out("head:")
         # se.Cls('FrontPage_clientImage__3KW8O').text().out("Image Page")
@@ -51,7 +51,7 @@ class iBench(Selen):
         se.home()  # Start main page
         se.Contains("Log in").click().Wait(l_h2).text("Log in")  # Click to login and wait for new page header with tex
         se.curr_url("https://ibench.net/login").title("Log in | iBench - real-time developers Hiring")
-        se.Img(check=True).check_links()
+        # se.Img(check=True).check_links()
 
         # Enter email and password with checking for update 'value' attribute and green checkmarks
         se.Find(NAME, "email").type(EMAIL).sleep(0.2).attr('value', EMAIL).out()
@@ -65,8 +65,21 @@ class iBench(Selen):
 
         se.Wait(l_h1).text("Daily updates")
         se.curr_url("https://ibench.net/stats").title("Daily updates | iBench - real-time developers Hiring")
-        se.Img(check=True).check_links()
-        # sleep(10)
+        # se.Img(check=True).check_links()
+        se.WD.get(se.url+'stats')
+        requesti = se.WD.requests
+        # for request in requesti:
+            # print(request.url)  # <--------------- Request url
+            # print(request.headers)  # <----------- Request headers
+            # print(request.response.headers)  # <-- Response headers
+        for request in requesti:
+            if "x-solt" in request.headers:
+                print(request.headers)
+                print("x-solt", request.headers["x-solt"])
+
+
+
+        sleep(100)
 
         # se.Find(NAME, "email").xpath_query().out("XPath")
         # se.Wait(l_h2).text("Log in")
@@ -77,19 +90,19 @@ class iBench(Selen):
         se.Wait(l_h1).text(
             """iBench is an easy hiring way to find new highly-skilled Remote developers in 2-3 business days after your request.""")
         se.curr_url('https://ibench.net/about').title('About | iBench - real-time developers Hiring')
-        # se.Img(check=True).check_links()
+        se.Img(check=True).check_links()
 
     def blog(se):
         se.Wait(CLASS, "breadcrumbs").Tag("span", 1).text("Blog")
         se.curr_url('https://ibench.net/blog/').title('iBench - iBench - real-time developers Hiring')
-        # se.Img(check=True).check_links()
+        se.Img(check=True).check_links()
 
     def hire_remote_team(se):
         se.Wait(l_h1).text('Hire remote developers team')
         se.title().out("Title :")
         se.title("iBench - real-time developers Hiring")
         se.curr_url('https://ibench.net/team-search')  # .title('About | iBench - real-time developers Hiring')
-        # se.Img(check=True).check_links()
+        se.Img(check=True).check_links()
 
     def support_slack(se):
         se.Wait(CLASS, 'c-link').img().attr("alt", "Slack")
@@ -97,17 +110,17 @@ class iBench(Selen):
     def privacy(se):
         se.Wait(l_h1).text('Privacy Notice')
         se.curr_url('https://ibench.net/privacy-policy').title('Privacy Notice | iBench - real-time developers Hiring')
-        # se.Img(check=True).check_links()
+        se.Img(check=True).check_links()
 
     def cookie(se):
         se.Wait(l_h1).text('Cookie Policy')
         se.curr_url('https://ibench.net/cookie-policy').title('Cookie Policy | iBench - real-time developers Hiring')
-        # se.Img(check=True).check_links()
+        se.Img(check=True).check_links()
 
     def terms(se):
         se.Wait(l_h1).text('Terms Of Use')
         se.curr_url('https://ibench.net/terms-of-use').title('Terms Of Use | iBench - real-time developers Hiring')
-        # se.Img(check=True).check_links()
+        se.Img(check=True).check_links()
 
     def nav_menu(se, locator):
         texts = [elem.text for elem in se.Wait(locator).elems]
@@ -134,7 +147,7 @@ class iBench(Selen):
 
     def login_cookies(self):
         self.add_cookies()
-        self.WD.get(self.url)
+        self.WD.get(self.url+'stats')
         sleep(20)
         # self.main_page()
 
@@ -150,7 +163,8 @@ class iBench(Selen):
 
 if __name__ == "__main__":
     # iBench('Edge').foot_nav_menu()
-    iBench().head_nav_menu()
-    # iBench().login()
+    # iBench().head_nav_menu()
+    iBench('Seleniumwire').login()
+    # iBench().login_cookies()
     print('FINISHED')
     sleep(10)
