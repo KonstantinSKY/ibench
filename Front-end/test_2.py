@@ -1,39 +1,50 @@
 import unittest
-from ibench import iBench as Cls
+
+import HtmlTestRunner
+
+# import HTMLTestRUnner
 
 
-class ChromeLoginTest(unittest.TestCase):
+from ibench import iBench
+
+
+class ChromePositiveTest(unittest.TestCase):
     browser_name = "Chrome"
 
     def setUp(self) -> None:
-        self.cls = Cls(self.browser_name)
+        self.ibench = iBench(self.browser_name)
 
     def test_login(self):
-        self.cls.login()
+        self.ibench.login()
 
     def test_home_page(self):
-        self.cls.home()
+        self.ibench.home()
 
     def test_header_menu(self):
-        self.cls.head_nav_menu()
+        self.ibench.head_nav_menu()
 
     def test_footer_menu(self):
-        self.cls.foot_nav_menu()
+        self.ibench.foot_nav_menu()
+
+    def test_recovery_password(self):
+        self.ibench.recovery_password()
 
     def tearDown(self) -> None:
-        self.cls.WD.close()
-        self.cls = None
+        self.ibench.WD.close()
+        self.ibench = None
 
 
-class FirefoxLoginTest(ChromeLoginTest):
+class FirefoxPositiveTest(ChromePositiveTest):
     browser_name = "Firefox"
 
 
-class EdgeLoginTest(ChromeLoginTest):
+class EdgePositiveTest(ChromePositiveTest):
     browser_name = "Edge"
 
 
-class OperaLoginTest(ChromeLoginTest):
+class OperaPositive(ChromePositiveTest):
     browser_name = "Opera"
 
 
+if __name__ == "__main__":
+    unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(output='./HtmlReport'))
